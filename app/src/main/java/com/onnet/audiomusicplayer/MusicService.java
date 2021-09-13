@@ -18,7 +18,6 @@ import android.util.Log;
 
 import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationCompat;
-import androidx.core.app.NotificationManagerCompat;
 
 import java.util.ArrayList;
 
@@ -26,11 +25,10 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         MediaPlayer.OnCompletionListener {
 
     public static final String CHANNEL_ID = "ForegroundServiceChannel";
-    private String TAG = this.getClass().getSimpleName();
+    private final String TAG = this.getClass().getSimpleName();
 
-    private boolean shuffle = false;
     private String songTitle = "";
-    private static final int NOTIFY_ID = 1;
+    private static final int NOTIFY_ID = 123;
     private MediaPlayer player;
     private ArrayList<Song> songs;
     private int songPosn;
@@ -44,7 +42,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         songPosn = 0;
         initMusicPlayer();
     }
-
+    @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         String input = intent.getStringExtra("inputExtra");
         createNotificationChannel();
@@ -53,13 +51,12 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
                 0, notificationIntent, 0);
         Notification notification = new NotificationCompat.Builder(this, CHANNEL_ID)
                 .setContentTitle("Music Player")
+                .setAutoCancel(true)
                 .setContentText(input)
                 .setSmallIcon(R.drawable.play)
                 .setContentIntent(pendingIntent)
                 .build();
-        startForeground(1, notification);
-        //do heavy work on a background thread
-        //stopSelf();
+        startForeground(NOTIFY_ID, notification);
         return START_NOT_STICKY;
     }
     private void createNotificationChannel() {
@@ -100,7 +97,12 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         Log.i(TAG, "onBind: called");
         return musicBind;
     }
-
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        Intent serviceIntent = new Intent(this, MainActivity.class);
+        stopService(serviceIntent);
+    }
     @Override
     public boolean onUnbind(Intent intent) {
         return false;
@@ -126,13 +128,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         player.prepareAsync();
     }
 
-     @Override
-        public void onDestroy() {
-        super.onDestroy();
-        stopForeground(true);
-        stopSelf();
 
-        }
     @Override
     public void onCompletion(MediaPlayer mp) {
         if (player.getCurrentPosition() > 0) {
@@ -212,28 +208,4 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         return songTitle;
     }
 
-
-    int notificationId = 1234;
-
-//    public void displayNotification() {
-//
-//        Log.i(TAG, "displayNotification: called");
-//        // Create an explicit intent for an Activity in your app
-//        Intent intent = new Intent(this, MainActivity.class);
-//        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-//        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, 0);
-//
-//
-//        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, CHANNEL_ID)
-//                .setSmallIcon(R.mipmap.ic_launcher)
-//                .setContentTitle("Onnet Music Player")
-//                .setContentText("Audio playing")
-//                .setPriority(NotificationCompat.PRIORITY_HIGH)
-//                // Set the intent that will fire when the user taps the notification
-//                .setContentIntent(pendingIntent)
-//                .setAutoCancel(true);
-//
-//        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
-//        notificationManager.notify(notificationId, builder.build());
-//    }
 }
