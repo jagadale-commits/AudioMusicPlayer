@@ -384,8 +384,7 @@ public class MainActivity extends AppCompatActivity implements MediaPlayerContro
         super.onDestroy();
         Log.d(TAG, "from activity");
         seekBarHandler.removeCallbacks(seekRunnable);
-        Intent serviceIntent = new Intent(this, MusicService.class);
-        stopService(serviceIntent);
+
     }
 
     @Override
