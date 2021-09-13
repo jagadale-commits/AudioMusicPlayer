@@ -51,12 +51,12 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
                 0, notificationIntent, 0);
         Notification notification = new NotificationCompat.Builder(this, CHANNEL_ID)
                 .setContentTitle("Music Player")
-                .setAutoCancel(true)
                 .setContentText(input)
-                .setSmallIcon(R.drawable.play)
+                .setSmallIcon(R.drawable.playlist)
                 .setContentIntent(pendingIntent)
                 .build();
         startForeground(NOTIFY_ID, notification);
+        stopForeground(true);
         return START_NOT_STICKY;
     }
     private void createNotificationChannel() {
@@ -97,12 +97,14 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         Log.i(TAG, "onBind: called");
         return musicBind;
     }
+
     @Override
-    public void onDestroy() {
+    public void onDestroy(){
+
         super.onDestroy();
-        Intent serviceIntent = new Intent(this, MainActivity.class);
-        stopService(serviceIntent);
+        Log.d(TAG, "from service");
     }
+
     @Override
     public boolean onUnbind(Intent intent) {
         return false;
