@@ -1,5 +1,8 @@
 package com.onnet.audiomusicplayer;
 
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.ContentUris;
@@ -22,7 +25,7 @@ import java.util.ArrayList;
 public class MusicService extends Service implements MediaPlayer.OnPreparedListener, MediaPlayer.OnErrorListener,
         MediaPlayer.OnCompletionListener {
 
-
+    public static final String CHANNEL_ID = "ForegroundServiceChannel";
     private String TAG = this.getClass().getSimpleName();
 
     private boolean shuffle = false;
@@ -42,6 +45,34 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         initMusicPlayer();
     }
 
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        String input = intent.getStringExtra("inputExtra");
+        createNotificationChannel();
+        Intent notificationIntent = new Intent(this, MainActivity.class);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this,
+                0, notificationIntent, 0);
+        Notification notification = new NotificationCompat.Builder(this, CHANNEL_ID)
+                .setContentTitle("Music Player")
+                .setContentText(input)
+                .setSmallIcon(R.drawable.play)
+                .setContentIntent(pendingIntent)
+                .build();
+        startForeground(1, notification);
+        //do heavy work on a background thread
+        //stopSelf();
+        return START_NOT_STICKY;
+    }
+    private void createNotificationChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel serviceChannel = new NotificationChannel(
+                    CHANNEL_ID,
+                    "Foreground Service Channel",
+                    NotificationManager.IMPORTANCE_DEFAULT
+            );
+            NotificationManager manager = getSystemService(NotificationManager.class);
+            manager.createNotificationChannel(serviceChannel);
+        }
+    }
     public void initMusicPlayer() {
 
         player = new MediaPlayer();
@@ -95,10 +126,13 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         player.prepareAsync();
     }
 
-    /*    @Override
+     @Override
         public void onDestroy() {
-           stopForeground(true);
-        }*/
+        super.onDestroy();
+        stopForeground(true);
+        stopSelf();
+
+        }
     @Override
     public void onCompletion(MediaPlayer mp) {
         if (player.getCurrentPosition() > 0) {
@@ -178,28 +212,28 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         return songTitle;
     }
 
-    String CHANNEL_ID = "MusicPlayer";
+
     int notificationId = 1234;
 
-    public void displayNotification() {
-
-        Log.i(TAG, "displayNotification: called");
-        // Create an explicit intent for an Activity in your app
-        Intent intent = new Intent(this, MainActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, 0);
-
-
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, CHANNEL_ID)
-                .setSmallIcon(R.mipmap.ic_launcher)
-                .setContentTitle("Onnet Music Player")
-                .setContentText("Audio playing")
-                .setPriority(NotificationCompat.PRIORITY_HIGH)
-                // Set the intent that will fire when the user taps the notification
-                .setContentIntent(pendingIntent)
-                .setAutoCancel(true);
-
-        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
-        notificationManager.notify(notificationId, builder.build());
-    }
+//    public void displayNotification() {
+//
+//        Log.i(TAG, "displayNotification: called");
+//        // Create an explicit intent for an Activity in your app
+//        Intent intent = new Intent(this, MainActivity.class);
+//        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+//        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, 0);
+//
+//
+//        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, CHANNEL_ID)
+//                .setSmallIcon(R.mipmap.ic_launcher)
+//                .setContentTitle("Onnet Music Player")
+//                .setContentText("Audio playing")
+//                .setPriority(NotificationCompat.PRIORITY_HIGH)
+//                // Set the intent that will fire when the user taps the notification
+//                .setContentIntent(pendingIntent)
+//                .setAutoCancel(true);
+//
+//        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
+//        notificationManager.notify(notificationId, builder.build());
+//    }
 }
