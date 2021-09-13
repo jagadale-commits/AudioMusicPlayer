@@ -106,6 +106,26 @@ public class MainActivity extends AppCompatActivity implements MediaPlayerContro
 
         seekBarHandler.postDelayed(seekRunnable, 1000);
 
+        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                if(musicSrv.isPng() && fromUser){
+                    musicSrv.seek(progress);
+                }
+            }
+        });
+
         songListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
