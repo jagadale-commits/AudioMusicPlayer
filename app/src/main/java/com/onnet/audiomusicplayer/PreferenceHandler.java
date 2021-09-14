@@ -57,4 +57,5 @@ public class PreferenceHandler {
         editor.remove(playlistname);
         editor.commit();
     }
+    
 }

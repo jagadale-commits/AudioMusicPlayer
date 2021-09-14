@@ -2,6 +2,8 @@ package com.onnet.audiomusicplayer;
 
 import android.os.Build;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ListView;
 
 import androidx.annotation.RequiresApi;
@@ -20,6 +22,7 @@ public class ViewPlayListActivity extends AppCompatActivity {
 
     ArrayList<Song> songsList;
 
+
     @RequiresApi(api = Build.VERSION_CODES.Q)
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -31,10 +34,19 @@ public class ViewPlayListActivity extends AppCompatActivity {
         lvAudioFiles = findViewById(R.id.songslist);
 
         songsList = PreferenceHandler.getPlayList(playListName);
-
         PlaylistAdapter playlistAdapter = new PlaylistAdapter(this, null, songsList);
         lvAudioFiles.setAdapter(playlistAdapter);
+        lvAudioFiles.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
+                playlistAdapter.removeSong(i, playListName);
+                return false;
+            }
+        });
+
+
     }
+
 
     @Override
     protected void onPause() {

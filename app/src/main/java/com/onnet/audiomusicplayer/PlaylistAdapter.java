@@ -93,6 +93,12 @@ class PlaylistAdapter extends BaseAdapter {
         return convertView;
     }
 
+    public void removeSong(int i, String playlistName) {
+        songsArrayList.remove(i);
+        PreferenceHandler.savePlayList(playlistName, songsArrayList);
+        notifyDataSetChanged();
+    }
+
 
     public class ViewHolder {
         TextView songView;
@@ -138,7 +144,13 @@ class PlaylistAdapter extends BaseAdapter {
                     notifyDataSetChanged();
                     Log.i(TAG, "onMenuItemClick: delete" + position);
                     return true;
-                } else {
+                } else if (i == R.id.add) {
+                    //do something
+                    Intent intent = new Intent(mContext, AddSongActivity.class);
+                    intent.putExtra("name", playlistNames.get(position));
+                    mContext.startActivity(intent);
+                    return true;
+                }else {
                     return onMenuItemClick(item);
                 }
             }
