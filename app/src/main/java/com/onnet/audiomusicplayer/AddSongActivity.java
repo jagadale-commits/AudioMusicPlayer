@@ -58,7 +58,6 @@ public class AddSongActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 ArrayList<Song> selectedSongs = ((SongAdapter) lvAudioFiles.getAdapter()).getSelectedItems();
-                selectedSongs.addAll(originalSongs);
                 if (selectedSongs.size() == 0) {
                     Utils.showToast(getApplicationContext(), "Please select, atleast one song");
                 } else {

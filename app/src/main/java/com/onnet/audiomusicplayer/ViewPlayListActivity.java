@@ -64,11 +64,19 @@ public class ViewPlayListActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
+
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+        songFiles = findViewById(R.id.songslist);
+        songsList = PreferenceHandler.getPlayList(playListName);
+        songPlaylistAdapter playlistAdapter;
+
+        playlistAdapter = new songPlaylistAdapter(this, playListName, songsList);
+
+        songFiles.setAdapter(playlistAdapter);
     }
 
     @Override
