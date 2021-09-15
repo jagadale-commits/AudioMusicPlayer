@@ -92,6 +92,12 @@ public class MainActivity extends AppCompatActivity implements MediaPlayerContro
                 e.printStackTrace();
             }
         }
+        songList = new ArrayList<>();
+        getSongList();
+        Collections.sort(songList, Comparator.comparing(Song::getTitle));
+        PreferenceHandler.savePlayList("All Songs", songList);
+
+
 
         btnAddPlaylist.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -328,39 +334,15 @@ public class MainActivity extends AppCompatActivity implements MediaPlayerContro
         for (int i = 0; i < viewItems.length; i++) {
         }
 
-      /*  if(musicSrv.isPng() && Integer.parseInt(view.getTag().toString()) == musicSrv.getPosn())
-            controller.show();
-        else
-        {
-                musicSrv.setSong(Integer.parseInt(view.getTag().toString()));
-                musicSrv.playSong();
-        }
-        if (playbackPaused) {
-            setController();
-            playbackPaused = false;
-        }
-        controller.show(0);*/
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            /*case R.id.home:
-                break;*/
             case R.id.create_playlist:
-//                setContentView(R.layout.main_allsongs);
-
                 Intent intent = new Intent(MainActivity.this, AddPlayListActivity.class);
                 startActivity(intent);
-
-                /*ListView songView = findViewById(R.id.song_list);
-                songView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
-                songList = new ArrayList<>();
-                getSongList();
-                Collections.sort(songList, Comparator.comparing(Song::getTitle));
-                SongAdapter songAdt = new SongAdapter(this, songList);
-                songView.setAdapter(songAdt);*/
 
                 break;
             case R.id.action_end:
@@ -374,7 +356,6 @@ public class MainActivity extends AppCompatActivity implements MediaPlayerContro
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-//        getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
     }
 
@@ -452,24 +433,8 @@ public class MainActivity extends AppCompatActivity implements MediaPlayerContro
     }
 
 
-    public void displayAllSongsList() {
-        songList = new ArrayList<>();
-        getSongList();
-        Collections.sort(songList, Comparator.comparing(Song::getTitle));
-        SongAdapter songAdt = new SongAdapter(this, songList);
-        songListView.setAdapter(songAdt);
 
-        songListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                musicSrv.setSongsList(songList, i);
-                musicSrv.playSong();
-                Song song = songList.get(i);
-                song.getArtist();
-                long id = song.getId();
-            }
-        });
-    }
+
 
     ArrayList<String> playList;
     PlaylistAdapter playlistAdapter;
@@ -523,5 +488,6 @@ public class MainActivity extends AppCompatActivity implements MediaPlayerContro
         NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
         notificationManager.notify(notificationId, builder.build());
     }
+
 
 }

@@ -93,11 +93,6 @@ class PlaylistAdapter extends BaseAdapter {
         return convertView;
     }
 
-    public void removeSong(int i, String playlistName) {
-        songsArrayList.remove(i);
-        PreferenceHandler.savePlayList(playlistName, songsArrayList);
-        notifyDataSetChanged();
-    }
 
 
     public class ViewHolder {

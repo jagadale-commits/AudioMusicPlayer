@@ -31,14 +31,7 @@ public class AddPlayListActivity extends AppCompatActivity {
 
     private String TAG = this.getClass().getSimpleName();
 
-    private boolean paused;
-    private boolean playbackPaused;
-    private MediaController controller;
-    private MusicService musicSrv;
-    private Intent playIntent;
-    private boolean musicBound = false;
     private ArrayList<Song> songsList;
-    private static final int READ_STORAGE_PERMISSION_REQUEST_CODE = 41;
     ListView lvAudioFiles;
     LinearLayout llFirst;
     Button btnNext, btnDone;
@@ -119,25 +112,6 @@ public class AddPlayListActivity extends AppCompatActivity {
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        /*switch (item.getItemId()) {
-            case R.id.home:
-                break;
-            case R.id.create_playlist:
-//                setContentView(R.layout.main_allsongs);
-                ListView songView = findViewById(R.id.song_list);
-                songView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
-                songsList = new ArrayList<>();
-                getSongList();
-                Collections.sort(songsList, Comparator.comparing(Song::getTitle));
-                SongAdapter songAdt = new SongAdapter(this, songsList);
-                songView.setAdapter(songAdt);
-                break;
-            case R.id.action_end:
-                stopService(playIntent);
-                musicSrv = null;
-                System.exit(0);
-                break;
-        }*/
         return super.onOptionsItemSelected(item);
     }
 
