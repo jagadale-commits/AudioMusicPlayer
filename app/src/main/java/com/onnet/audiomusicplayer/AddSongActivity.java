@@ -25,6 +25,7 @@ import android.widget.MediaController;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
 
 public class AddSongActivity extends AppCompatActivity {
     private String TAG = this.getClass().getSimpleName();
@@ -35,6 +36,7 @@ public class AddSongActivity extends AppCompatActivity {
     Button btnNext, btnDone;
     EditText etPlaylistName;
     String playListName;
+    HashSet<Long> orginalIDs;
 
     @RequiresApi(api = Build.VERSION_CODES.Q)
     @Override
@@ -48,6 +50,9 @@ public class AddSongActivity extends AppCompatActivity {
         etPlaylistName = findViewById(R.id.playlistname);
 
         ArrayList<Song> originalSongs = PreferenceHandler.getPlayList( playListName);
+        orginalIDs = new HashSet<>();
+        for(Song s : originalSongs)
+            orginalIDs.add(s.getId());
 
         btnDone.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -136,7 +141,10 @@ public class AddSongActivity extends AppCompatActivity {
                 long thisId = musicCursor.getLong(idColumn);
                 String thisTitle = musicCursor.getString(titleColumn);
                 String thisArtist = musicCursor.getString(artistColumn);
-                songsList.add(new Song(thisId, thisTitle, thisArtist, false));
+                if(orginalIDs.contains(thisId))
+                songsList.add(new Song(thisId, thisTitle, thisArtist, true));
+                else
+                    songsList.add(new Song(thisId, thisTitle, thisArtist, false));
             } while (musicCursor.moveToNext());
         }
     }
