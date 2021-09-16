@@ -49,7 +49,7 @@ public class MainActivity extends AppCompatActivity implements MediaPlayerContro
     private boolean paused;
     private boolean playbackPaused;
     private MediaController controller;
-    private MusicService musicSrv;
+    public static MusicService musicSrv;
     private Intent playIntent;
     private boolean musicBound = false;
     private ArrayList<Song> songList;
