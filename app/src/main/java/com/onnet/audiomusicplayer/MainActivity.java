@@ -62,26 +62,14 @@ public class MainActivity extends AppCompatActivity implements MediaPlayerContro
     ImageView ivPlayPause, ivNext, ivPrev;
     SeekBar seekBar;
     TextView tvEndTime, tvStartTime;
-
+    ArrayList<String> playList;
+    PlaylistAdapter playlistAdapter;
 
     @RequiresApi(api = Build.VERSION_CODES.Q)
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        ivPlayPause = findViewById(R.id.playpause);
-        ivNext = findViewById(R.id.next);
-        ivPrev = findViewById(R.id.prev);
-        seekBar = findViewById(R.id.seekbar);
-        tvStartTime = findViewById(R.id.starttime);
-        tvEndTime = findViewById(R.id.endtime);
-
-        tvSongTitle = findViewById(R.id.songname);
-        tvError = findViewById(R.id.error);
-        songListView = findViewById(R.id.song_list);
-        llError = findViewById(R.id.errorlayout);
-        btnAddPlaylist = findViewById(R.id.addplaylist);
 
 
         PreferenceHandler.init(this);
@@ -93,12 +81,25 @@ public class MainActivity extends AppCompatActivity implements MediaPlayerContro
                 e.printStackTrace();
             }
         }
-        songList = new ArrayList<>();
-        getSongList();
-        Collections.sort(songList, Comparator.comparing(Song::getTitle));
-        PreferenceHandler.savePlayList("All Songs", songList);
+        if(checkPermissionForReadExtertalStorage(this)) {
+            ivPlayPause = findViewById(R.id.playpause);
+            ivNext = findViewById(R.id.next);
+            ivPrev = findViewById(R.id.prev);
+            seekBar = findViewById(R.id.seekbar);
+            tvStartTime = findViewById(R.id.starttime);
+            tvEndTime = findViewById(R.id.endtime);
 
-
+            tvSongTitle = findViewById(R.id.songname);
+            tvError = findViewById(R.id.error);
+            songListView = findViewById(R.id.song_list);
+            llError = findViewById(R.id.errorlayout);
+            btnAddPlaylist = findViewById(R.id.addplaylist);
+            songList = new ArrayList<>();
+            getSongList();
+            Collections.sort(songList, Comparator.comparing(Song::getTitle));
+            PreferenceHandler.savePlayList("All Songs", songList);
+            fetchPlayList();
+        }
 
         btnAddPlaylist.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -327,17 +328,8 @@ public class MainActivity extends AppCompatActivity implements MediaPlayerContro
             throw e;
         }
     }
-
-    public void songsPicked(View view) {
-        ListView songView = findViewById(R.id.song_list);
-        long[] viewItems = songView.getCheckedItemIds();
-        Log.d("fun", viewItems.toString());
-        for (int i = 0; i < viewItems.length; i++) {
-        }
-
-    }
-
-    @RequiresApi(api = Build.VERSION_CODES.O)
+    
+  /*  @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
@@ -353,7 +345,7 @@ public class MainActivity extends AppCompatActivity implements MediaPlayerContro
                 break;
         }
         return super.onOptionsItemSelected(item);
-    }
+    }*/
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -364,7 +356,6 @@ public class MainActivity extends AppCompatActivity implements MediaPlayerContro
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        Log.d(TAG, "from activity");
         seekBarHandler.removeCallbacks(seekRunnable);
 
     }
@@ -434,11 +425,6 @@ public class MainActivity extends AppCompatActivity implements MediaPlayerContro
     }
 
 
-
-
-
-    ArrayList<String> playList;
-    PlaylistAdapter playlistAdapter;
 
     public void fetchPlayList() {
         playList = PreferenceHandler.getAllKeys();
