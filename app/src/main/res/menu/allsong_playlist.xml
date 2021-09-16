@@ -2,15 +2,15 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
-        android:id="@+id/delete"
-        android:icon="@drawable/end"
-        android:orderInCategory="2"
-        app:showAsAction="ifRoom"
-        android:title="Delete"/>
-    <item
         android:id="@+id/play"
-        android:icon="@drawable/end"
+        android:icon="@drawable/home"
         android:orderInCategory="1"
         app:showAsAction="ifRoom"
         android:title="Play"/>
+    <item
+        android:id="@+id/view"
+        android:icon="@drawable/playlistview"
+        android:orderInCategory="2"
+        app:showAsAction="ifRoom"
+        android:title="View"/>
 </menu>

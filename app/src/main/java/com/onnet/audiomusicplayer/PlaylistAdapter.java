@@ -78,11 +78,8 @@ class PlaylistAdapter extends BaseAdapter {
         } else {
             String currSong = playlistNames.get(position);
             viewHolder.songView.setText(currSong);
-            if (!currSong.equals("All Songs")) {
-                viewHolder.ivMoreAction.setVisibility(View.VISIBLE);
-            } else {
-                viewHolder.ivMoreAction.setVisibility(View.GONE);
-            }
+            viewHolder.ivMoreAction.setVisibility(View.VISIBLE);
+
         }
 
 
@@ -113,7 +110,10 @@ class PlaylistAdapter extends BaseAdapter {
 
     public void showPopMenu(View finalConvertView, int position) {
         final PopupMenu popup = new PopupMenu(((MainActivity) mContext), finalConvertView.findViewById(R.id.moreaction));
+        if (! playlistNames.get(position).equals("All Songs"))
         popup.getMenuInflater().inflate(R.menu.menu_playlist, popup.getMenu());
+        else
+            popup.getMenuInflater().inflate(R.menu.allsong_playlist, popup.getMenu());
         popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
             public boolean onMenuItemClick(MenuItem item) {
                 int i = item.getItemId();

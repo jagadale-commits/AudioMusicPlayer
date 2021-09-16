@@ -83,6 +83,7 @@ public class MainActivity extends AppCompatActivity implements MediaPlayerContro
         llError = findViewById(R.id.errorlayout);
         btnAddPlaylist = findViewById(R.id.addplaylist);
 
+
         PreferenceHandler.init(this);
 
         if (!checkPermissionForReadExtertalStorage(this)) {

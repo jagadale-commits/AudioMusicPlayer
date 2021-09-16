@@ -39,7 +39,8 @@ public class ViewPlayListActivity extends AppCompatActivity {
         setContentView(R.layout.activity_viewplaylist);
         addbtn = findViewById(R.id.addsongs);
         playListName = getIntent().getStringExtra("name");
-
+        if(!playListName.equals("All Songs"))
+            addbtn.setVisibility(View.VISIBLE);
         addbtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

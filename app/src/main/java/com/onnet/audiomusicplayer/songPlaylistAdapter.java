@@ -1,6 +1,13 @@
 package com.onnet.audiomusicplayer;
 
+import android.content.ContentUris;
 import android.content.Context;
+import android.content.Intent;
+import android.media.AudioManager;
+import android.media.MediaPlayer;
+import android.net.Uri;
+import android.os.Parcelable;
+import android.os.PowerManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -56,6 +63,7 @@ class songPlaylistAdapter extends BaseAdapter {
             convertView = songInf.inflate(R.layout.playlist_song, parent, false);
 
             viewHolder.songView = convertView.findViewById(R.id.song_title);
+
             viewHolder.ivMoreAction = convertView.findViewById(R.id.moreaction);
             viewHolder.rlRoot = convertView.findViewById(R.id.rootlayout);
             convertView.setTag(viewHolder);
@@ -66,10 +74,9 @@ class songPlaylistAdapter extends BaseAdapter {
 
             Song currSong = songsArrayList.get(position);
             viewHolder.songView.setText(currSong.getTitle());
-        if(!playlistName.equals("All Songs"))
             viewHolder.ivMoreAction.setVisibility(View.VISIBLE);
-        else
-            viewHolder.ivMoreAction.setVisibility(View.GONE);
+
+
 
         View finalConvertView = convertView;
         viewHolder.ivMoreAction.setOnClickListener(new View.OnClickListener() {
@@ -92,7 +99,10 @@ class songPlaylistAdapter extends BaseAdapter {
 
     public void showPopMenu(View finalConvertView, int position) {
         final PopupMenu popup = new PopupMenu(((ViewPlayListActivity) mContext), finalConvertView.findViewById(R.id.moreaction));
-        popup.getMenuInflater().inflate(R.menu.menu_song_delete, popup.getMenu());
+        if(playlistName.equals("All Songs"))
+            popup.getMenuInflater().inflate(R.menu.menu_song_play, popup.getMenu());
+        else
+            popup.getMenuInflater().inflate(R.menu.menu_song_delete, popup.getMenu());
         popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
             public boolean onMenuItemClick(MenuItem item) {
                 int i = item.getItemId();
@@ -101,7 +111,13 @@ class songPlaylistAdapter extends BaseAdapter {
                     PreferenceHandler.savePlayList(playlistName, songsArrayList);
                     notifyDataSetChanged();
                     return true;
-                } else {
+                } else if (i == R.id.play){
+                    Intent intent = new Intent(mContext, MainActivity.class);
+                    intent.putExtra("songID", String.valueOf (position));
+                    intent.putExtra("list", (Parcelable) songsArrayList);
+                    mContext.startActivity(intent);
+                    return true;
+                } else{
                     return onMenuItemClick(item);
                 }
             }
