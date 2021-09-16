@@ -49,7 +49,7 @@ public class MainActivity extends AppCompatActivity implements MediaPlayerContro
     private boolean paused;
     private boolean playbackPaused;
     private MediaController controller;
-    private MusicService musicSrv;
+    public static MusicService musicSrv;
     private Intent playIntent;
     private boolean musicBound = false;
     private ArrayList<Song> songList;
@@ -284,7 +284,7 @@ public class MainActivity extends AppCompatActivity implements MediaPlayerContro
                 long thisId = musicCursor.getLong(idColumn);
                 String thisTitle = musicCursor.getString(titleColumn);
                 String thisArtist = musicCursor.getString(artistColumn);
-                songList.add(new Song(thisId, thisTitle, thisArtist, true));
+                songList.add(new Song(thisId, thisTitle, thisArtist, false));
             } while (musicCursor.moveToNext());
         }
     }

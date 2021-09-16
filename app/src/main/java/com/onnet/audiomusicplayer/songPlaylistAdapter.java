@@ -22,6 +22,8 @@ import androidx.appcompat.widget.PopupMenu;
 
 import java.util.ArrayList;
 
+import static com.onnet.audiomusicplayer.MainActivity.musicSrv;
+
 class songPlaylistAdapter extends BaseAdapter {
 
     private final String playlistName;
@@ -112,9 +114,11 @@ class songPlaylistAdapter extends BaseAdapter {
                     notifyDataSetChanged();
                     return true;
                 } else if (i == R.id.play){
+                    if(musicSrv!=null) {
+                        musicSrv.setSongsList(songsArrayList, position);
+                        musicSrv.playSong();
+                    }
                     Intent intent = new Intent(mContext, MainActivity.class);
-                    intent.putExtra("songID", String.valueOf (position));
-                    intent.putExtra("list", (Parcelable) songsArrayList);
                     mContext.startActivity(intent);
                     return true;
                 } else{
