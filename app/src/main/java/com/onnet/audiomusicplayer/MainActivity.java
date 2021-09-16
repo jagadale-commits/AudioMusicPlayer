@@ -70,8 +70,6 @@ public class MainActivity extends AppCompatActivity implements MediaPlayerContro
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-
         PreferenceHandler.init(this);
 
         if (!checkPermissionForReadExtertalStorage(this)) {
@@ -80,27 +78,33 @@ public class MainActivity extends AppCompatActivity implements MediaPlayerContro
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        }
-        if(checkPermissionForReadExtertalStorage(this)) {
-            ivPlayPause = findViewById(R.id.playpause);
-            ivNext = findViewById(R.id.next);
-            ivPrev = findViewById(R.id.prev);
-            seekBar = findViewById(R.id.seekbar);
-            tvStartTime = findViewById(R.id.starttime);
-            tvEndTime = findViewById(R.id.endtime);
-
-            tvSongTitle = findViewById(R.id.songname);
-            tvError = findViewById(R.id.error);
-            songListView = findViewById(R.id.song_list);
-            llError = findViewById(R.id.errorlayout);
-            btnAddPlaylist = findViewById(R.id.addplaylist);
-            songList = new ArrayList<>();
-            getSongList();
-            Collections.sort(songList, Comparator.comparing(Song::getTitle));
-            PreferenceHandler.savePlayList("All Songs", songList);
-            fetchPlayList();
+        }else
+        {
+          setLayout();
         }
 
+
+    }
+    public void setLayout()
+    {
+        llError = findViewById(R.id.errorlayout);
+        songListView = findViewById(R.id.song_list);
+
+        btnAddPlaylist = findViewById(R.id.addplaylist);
+        ivPlayPause = findViewById(R.id.playpause);
+        ivNext = findViewById(R.id.next);
+        ivPrev = findViewById(R.id.prev);
+        seekBar = findViewById(R.id.seekbar);
+        tvStartTime = findViewById(R.id.starttime);
+        tvEndTime = findViewById(R.id.endtime);
+
+        tvSongTitle = findViewById(R.id.songname);
+        tvError = findViewById(R.id.error);
+        songList = new ArrayList<>();
+        getSongList();
+        Collections.sort(songList, Comparator.comparing(Song::getTitle));
+        PreferenceHandler.savePlayList("All Songs", songList);
+        fetchPlayList();
         btnAddPlaylist.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -108,9 +112,6 @@ public class MainActivity extends AppCompatActivity implements MediaPlayerContro
                 startActivity(intent);
             }
         });
-
-//        displayAllSongsList();
-//        fetchPlayList();
 
         seekBarHandler.postDelayed(seekRunnable, 1000);
 
@@ -174,7 +175,23 @@ public class MainActivity extends AppCompatActivity implements MediaPlayerContro
             }
         });
     }
-
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           String permissions[], int[] grantResults) {
+        if (requestCode == READ_STORAGE_PERMISSION_REQUEST_CODE) {
+            if (grantResults.length > 0
+                    && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+               setLayout();
+            } else {
+                try {
+                    requestPermissionForReadExtertalStorage(this);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+    }
     @Override
     protected void onStart() {
         super.onStart();
@@ -328,24 +345,6 @@ public class MainActivity extends AppCompatActivity implements MediaPlayerContro
             throw e;
         }
     }
-    
-  /*  @RequiresApi(api = Build.VERSION_CODES.O)
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.create_playlist:
-                Intent intent = new Intent(MainActivity.this, AddPlayListActivity.class);
-                startActivity(intent);
-
-                break;
-            case R.id.action_end:
-                stopService(playIntent);
-                musicSrv = null;
-                System.exit(0);
-                break;
-        }
-        return super.onOptionsItemSelected(item);
-    }*/
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
