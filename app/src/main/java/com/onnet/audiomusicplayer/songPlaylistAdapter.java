@@ -66,8 +66,10 @@ class songPlaylistAdapter extends BaseAdapter {
 
             Song currSong = songsArrayList.get(position);
             viewHolder.songView.setText(currSong.getTitle());
+        if(!playlistName.equals("All Songs"))
             viewHolder.ivMoreAction.setVisibility(View.VISIBLE);
-
+        else
+            viewHolder.ivMoreAction.setVisibility(View.GONE);
 
         View finalConvertView = convertView;
         viewHolder.ivMoreAction.setOnClickListener(new View.OnClickListener() {

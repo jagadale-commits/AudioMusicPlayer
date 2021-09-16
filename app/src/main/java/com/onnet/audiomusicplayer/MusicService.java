@@ -132,11 +132,11 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
                     android.provider.MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
                     currSong);
             player.setDataSource(getApplicationContext(), trackUri);
-
+            player.prepareAsync();
         } catch (Exception e) {
             Log.e("MUSIC SERVICE", "Error setting data source", e);
         }
-        player.prepareAsync();
+
     }
 
 

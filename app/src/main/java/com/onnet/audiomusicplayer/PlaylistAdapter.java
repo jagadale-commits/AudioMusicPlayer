@@ -78,7 +78,11 @@ class PlaylistAdapter extends BaseAdapter {
         } else {
             String currSong = playlistNames.get(position);
             viewHolder.songView.setText(currSong);
-            viewHolder.ivMoreAction.setVisibility(View.VISIBLE);
+            if (!currSong.equals("All Songs")) {
+                viewHolder.ivMoreAction.setVisibility(View.VISIBLE);
+            } else {
+                viewHolder.ivMoreAction.setVisibility(View.GONE);
+            }
         }
 
 
