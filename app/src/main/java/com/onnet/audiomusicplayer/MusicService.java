@@ -20,6 +20,7 @@ import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationCompat;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 
 public class MusicService extends Service implements MediaPlayer.OnPreparedListener, MediaPlayer.OnErrorListener,
         MediaPlayer.OnCompletionListener {
@@ -123,19 +124,29 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
 
         playstop();
         player.reset();
+        ArrayList<Song> originalSongs = PreferenceHandler.getPlayList("All Songs");
+        HashSet<Long> Allsong = new HashSet<>();
+        for(Song s : originalSongs)
+            Allsong.add(s.getId());
         Song playSong = songs.get(songPosn);
+
         songTitle = playSong.getTitle();
         long currSong = playSong.getId();
-
-        try {
-            Uri trackUri = ContentUris.withAppendedId(
-                    android.provider.MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
-                    currSong);
-            player.setDataSource(getApplicationContext(), trackUri);
-            player.prepareAsync();
-        } catch (Exception e) {
-            Log.e("MUSIC SERVICE", "Error setting data source", e);
-        }
+       if(Allsong.contains(currSong)) {
+           try {
+               Uri trackUri = ContentUris.withAppendedId(
+                       android.provider.MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+                       currSong);
+               player.setDataSource(getApplicationContext(), trackUri);
+               player.prepareAsync();
+           } catch (Exception e) {
+               Log.e("MUSIC SERVICE", "Error setting data source", e);
+           }
+       }
+       else {
+           songs.remove(songPosn);
+           playNext();
+       }
 
     }
 

@@ -17,6 +17,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 
 
 public class ViewPlayListActivity extends AppCompatActivity {
@@ -29,6 +30,7 @@ public class ViewPlayListActivity extends AppCompatActivity {
 
     ArrayList<Song> songsList;
     Button addbtn;
+
 
     @RequiresApi(api = Build.VERSION_CODES.Q)
     @Override
