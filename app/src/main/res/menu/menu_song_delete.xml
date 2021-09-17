@@ -6,11 +6,11 @@
         android:icon="@drawable/end"
         android:orderInCategory="2"
         app:showAsAction="ifRoom"
-        android:title="Delete"/>
+        android:title="@string/delete"/>
     <item
         android:id="@+id/play"
         android:icon="@drawable/end"
         android:orderInCategory="1"
         app:showAsAction="ifRoom"
-        android:title="Play"/>
+        android:title="@string/play"/>
 </menu>

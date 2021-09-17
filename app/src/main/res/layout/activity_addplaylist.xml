@@ -19,7 +19,7 @@
             android:layout_marginLeft="12dp"
             android:layout_marginTop="12dp"
             android:layout_marginRight="12dp"
-            android:hint="Enter playlist name" />
+            android:hint="@string/enter_playlist_name" />
 
         <Button
             android:id="@+id/next"
@@ -27,7 +27,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_marginTop="12dp"
-            android:text="Next" />
+            android:text="@string/next" />
 
     </LinearLayout>
 
@@ -40,7 +40,7 @@
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="12dp"
         android:visibility="gone"
-        android:text="Done" />
+        android:text="@string/done" />
 
     <ListView
         android:id="@+id/audiolistview"

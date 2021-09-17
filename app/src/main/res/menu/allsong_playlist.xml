@@ -6,11 +6,11 @@
         android:icon="@drawable/home"
         android:orderInCategory="1"
         app:showAsAction="ifRoom"
-        android:title="Play"/>
+        android:title="@string/play"/>
     <item
         android:id="@+id/view"
         android:icon="@drawable/playlistview"
         android:orderInCategory="2"
         app:showAsAction="ifRoom"
-        android:title="View"/>
+        android:title="@string/view"/>
 </menu>

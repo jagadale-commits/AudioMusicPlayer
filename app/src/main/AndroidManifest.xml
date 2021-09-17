@@ -9,12 +9,12 @@
 
     <application
         android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@drawable/icon"
         android:label="@string/app_name"
-        android:roundIcon="@mipmap/ic_launcher_round"
+        android:roundIcon="@drawable/icon"
         android:supportsRtl="true"
         android:theme="@style/Theme.AudioMusicPlayer">
-        <activity android:name=".AddSongActivity"></activity>
+        <activity android:name=".AddSongActivity" />
 
         <service
             android:name=".MusicService"
@@ -23,9 +23,9 @@
             android:stopWithTask="false" />
 
         <activity
-            android:name=".MainActivity"
+            android:name=".PermissionActivity"
             android:exported="true"
-            android:label="Music Player">
+            android:label="음악 플레이어">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -33,11 +33,14 @@
             </intent-filter>
         </activity>
         <activity
+            android:name=".MainActivity"
+            android:label="음악 플레이어" />
+        <activity
             android:name=".AddPlayListActivity"
-            android:label="Create Playlist" />
+            android:label="재생 목록 만들기" />
         <activity
             android:name=".ViewPlayListActivity"
-            android:label="Playlist" />
+            android:label="재생 목록" />
     </application>
 
 </manifest>

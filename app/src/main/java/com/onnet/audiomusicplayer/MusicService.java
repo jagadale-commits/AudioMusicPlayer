@@ -124,7 +124,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
 
         playstop();
         player.reset();
-        ArrayList<Song> originalSongs = PreferenceHandler.getPlayList("All Songs");
+        ArrayList<Song> originalSongs = PreferenceHandler.getPlayList("모든 노래");
         HashSet<Long> Allsong = new HashSet<>();
         for(Song s : originalSongs)
             Allsong.add(s.getId());

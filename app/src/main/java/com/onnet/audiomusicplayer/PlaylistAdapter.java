@@ -110,7 +110,7 @@ class PlaylistAdapter extends BaseAdapter {
 
     public void showPopMenu(View finalConvertView, int position) {
         final PopupMenu popup = new PopupMenu(((MainActivity) mContext), finalConvertView.findViewById(R.id.moreaction));
-        if (! playlistNames.get(position).equals("All Songs"))
+        if (! playlistNames.get(position).equals("모든 노래"))
         popup.getMenuInflater().inflate(R.menu.menu_playlist, popup.getMenu());
         else
             popup.getMenuInflater().inflate(R.menu.allsong_playlist, popup.getMenu());

@@ -112,7 +112,7 @@ class songPlaylistAdapter extends BaseAdapter {
 
     public void showPopMenu(View finalConvertView, int position) {
         final PopupMenu popup = new PopupMenu(((ViewPlayListActivity) mContext), finalConvertView.findViewById(R.id.moreaction));
-        if(playlistName.equals("All Songs"))
+        if(playlistName.equals("모든 노래"))
             popup.getMenuInflater().inflate(R.menu.menu_song_play, popup.getMenu());
         else
             popup.getMenuInflater().inflate(R.menu.menu_song_delete, popup.getMenu());

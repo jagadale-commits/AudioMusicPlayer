@@ -44,6 +44,7 @@ import java.util.concurrent.TimeUnit;
 
 public class MainActivity extends AppCompatActivity implements MediaPlayerControl {
 
+    private static final int READ_STORAGE_PERMISSION_REQUEST_CODE = 41 ;
     private String TAG = this.getClass().getSimpleName();
 
     private boolean paused;
@@ -53,7 +54,7 @@ public class MainActivity extends AppCompatActivity implements MediaPlayerContro
     private Intent playIntent;
     private boolean musicBound = false;
     private ArrayList<Song> songList;
-    private static final int READ_STORAGE_PERMISSION_REQUEST_CODE = 41;
+
     ListView songListView;
     LinearLayout llError;
     Button btnAddPlaylist;
@@ -73,11 +74,8 @@ public class MainActivity extends AppCompatActivity implements MediaPlayerContro
         PreferenceHandler.init(this);
 
         if (!checkPermissionForReadExtertalStorage(this)) {
-            try {
-                requestPermissionForReadExtertalStorage(this);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            Intent intent = new Intent(MainActivity.this, PermissionActivity.class);
+            startActivity(intent);
         }else
         {
           setLayout();
@@ -103,7 +101,7 @@ public class MainActivity extends AppCompatActivity implements MediaPlayerContro
         songList = new ArrayList<>();
         getSongList();
         Collections.sort(songList, Comparator.comparing(Song::getTitle));
-        PreferenceHandler.savePlayList("All Songs", songList);
+        PreferenceHandler.savePlayList("모든 노래", songList);
         fetchPlayList();
         btnAddPlaylist.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -463,8 +461,8 @@ public class MainActivity extends AppCompatActivity implements MediaPlayerContro
 
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, CHANNEL_ID)
-                .setSmallIcon(R.mipmap.ic_launcher)
-                .setContentTitle("Onnet Music Player")
+                .setSmallIcon(R.drawable.icon)
+                .setContentTitle("온넷 뮤직 플레이어")
                 .setContentText("Audio playing")
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 // Set the intent that will fire when the user taps the notification
