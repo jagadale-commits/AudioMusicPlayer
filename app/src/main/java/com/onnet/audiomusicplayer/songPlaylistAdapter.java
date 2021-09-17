@@ -81,6 +81,17 @@ class songPlaylistAdapter extends BaseAdapter {
 
 
         View finalConvertView = convertView;
+        viewHolder.songView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(musicSrv!=null) {
+                    musicSrv.setSongsList(songsArrayList, position);
+                    musicSrv.playSong();
+                }
+                Intent intent = new Intent(mContext, MainActivity.class);
+                mContext.startActivity(intent);
+            }
+        });
         viewHolder.ivMoreAction.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

@@ -212,7 +212,7 @@ public class MainActivity extends AppCompatActivity implements MediaPlayerContro
     @Override
     protected void onResume() {
         super.onResume();
-
+        if (checkPermissionForReadExtertalStorage(this))
         fetchPlayList();
         if (paused) {
             paused = false;
