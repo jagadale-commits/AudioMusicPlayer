@@ -2,7 +2,7 @@
     <string name="app_name">음악 플레이어</string>
     <string name="playlist">재생 목록</string>
     <string name="end">종료</string>
-    <string name="permission_denied_please_restart">권한이 거부되었습니다. 다시 시작하십시오.</string>
+    <string name="permission_denied_please_restart">사용 권한이 거부되었습니다. 요청 권한 단추를 클릭합니다.</string>
     <string name="done">완료</string>
     <string name="enter_playlist_name">재생 목록 이름 입력</string>
     <string name="next">다음</string>
@@ -11,5 +11,6 @@
     <string name="delete">삭제</string>
     <string name="add_songs">추가</string>
     <string name="create_playlist">재생 목록 만들기</string>
+    <string name="buttonpermission">권한 요청</string>
 
 </resources>

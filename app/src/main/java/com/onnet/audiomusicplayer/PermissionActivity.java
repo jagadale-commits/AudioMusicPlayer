@@ -10,16 +10,26 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 
 public class PermissionActivity extends AppCompatActivity {
     private static final int READ_STORAGE_PERMISSION_REQUEST_CODE = 41;
     TextView tvError;
+    Button btnPermission;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_permission);
         tvError = findViewById(R.id.textView);
+        btnPermission = findViewById(R.id.buttonP);
+        btnPermission.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                requestPermissionForReadExtertalStorage(PermissionActivity.this);
+            }
+        });
         if (!checkPermissionForReadExtertalStorage(this)) {
                 requestPermissionForReadExtertalStorage(this);
         }else
