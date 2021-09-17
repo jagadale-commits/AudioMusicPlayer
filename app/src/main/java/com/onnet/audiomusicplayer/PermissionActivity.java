@@ -33,11 +33,12 @@ public class PermissionActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 new AlertDialog.Builder(PermissionActivity.this)
-                        .setTitle("Permission Needed")
-                        .setMessage("Click On App Permissions \n" +
-                                "Click on Files and Media in Denied Section\n" +
-                                "Set Allow access to media only option")
-                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                        .setTitle("필요한 권한")
+                        .setMessage("권한을 활성화하려면 아래 단계를 따르십시오. \n" +
+                                "앱 사용 권한 클릭 \n" +
+                                "거부된 섹션의 파일 및 미디어를 클릭합니다.\n" +
+                                "미디어 전용 옵션에 대한 액세스 허용 설정")
+                        .setPositiveButton("그래", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 Intent intent = new Intent();
@@ -48,7 +49,7 @@ public class PermissionActivity extends AppCompatActivity {
                                 finish();
                             }
                         })
-                        .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                        .setNegativeButton("취소", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 dialog.dismiss();
