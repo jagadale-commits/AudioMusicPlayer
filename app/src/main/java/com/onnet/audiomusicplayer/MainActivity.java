@@ -462,8 +462,8 @@ public class MainActivity extends AppCompatActivity implements MediaPlayerContro
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, CHANNEL_ID)
                 .setSmallIcon(R.drawable.icon)
-                .setContentTitle("온넷 뮤직 플레이어")
-                .setContentText("Audio playing")
+                .setContentTitle(getString(R.string.NotificationTitle))
+                .setContentText(getString(R.string.notificationtext))
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 // Set the intent that will fire when the user taps the notification
                 .setContentIntent(pendingIntent)
