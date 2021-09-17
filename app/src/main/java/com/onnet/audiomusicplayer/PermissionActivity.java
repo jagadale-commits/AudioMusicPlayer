@@ -1,5 +1,6 @@
 package com.onnet.audiomusicplayer;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
@@ -17,27 +18,24 @@ public class PermissionActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        setContentView(R.layout.activity_permission);
+        tvError = findViewById(R.id.textView);
         if (!checkPermissionForReadExtertalStorage(this)) {
-            setContentView(R.layout.activity_permission);
-            tvError = findViewById(R.id.textView);
-            try {
                 requestPermissionForReadExtertalStorage(this);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
         }else
         {
+            finish();
             Intent intent = new Intent(this, MainActivity.class);
             startActivity(intent);
         }
     }
     @Override
     public void onRequestPermissionsResult(int requestCode,
-                                           String permissions[], int[] grantResults) {
+                                           @NonNull String[] permissions, @NonNull int[] grantResults) {
         if (requestCode == READ_STORAGE_PERMISSION_REQUEST_CODE) {
             if (grantResults.length > 0
                     && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                finish();
                 Intent intent = new Intent(this, MainActivity.class);
                 startActivity(intent);
             }
@@ -52,13 +50,8 @@ public class PermissionActivity extends AppCompatActivity {
         return false;
     }
 
-    public void requestPermissionForReadExtertalStorage(Context context) throws Exception {
-        try {
+    public void requestPermissionForReadExtertalStorage(Context context) {
             ActivityCompat.requestPermissions((Activity) context, new String[]{android.Manifest.permission.READ_EXTERNAL_STORAGE},
                     READ_STORAGE_PERMISSION_REQUEST_CODE);
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw e;
-        }
     }
 }
