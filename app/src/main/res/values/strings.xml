@@ -12,5 +12,7 @@
     <string name="add_songs">추가</string>
     <string name="create_playlist">재생 목록 만들기</string>
     <string name="buttonpermission">권한 요청</string>
+    <string name="notificationtext">오디오 재생</string>
+    <string name="NotificationTitle">온넷 뮤직 플레이어</string>
 
 </resources>

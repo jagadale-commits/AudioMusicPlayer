@@ -8,8 +8,10 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -27,7 +29,12 @@ public class PermissionActivity extends AppCompatActivity {
         btnPermission.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                requestPermissionForReadExtertalStorage(PermissionActivity.this);
+               Intent intent = new Intent();
+               intent.setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+               Uri uri = Uri.fromParts("package", PermissionActivity.this.getPackageName(), null);
+               intent.setData(uri);
+               PermissionActivity.this.startActivity(intent);
+               finish();
             }
         });
         if (!checkPermissionForReadExtertalStorage(this)) {
