@@ -3,7 +3,6 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
         android:id="@+id/play"
-        android:icon="@drawable/end"
         android:orderInCategory="1"
         app:showAsAction="ifRoom"
         android:title="@string/play"/>
