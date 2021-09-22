@@ -1,6 +1,6 @@
-package com.onnet.audiomusicplayer;
+package com.onnet.audiomusicplayer.lib;
 
-class Song {
+public class Song {
     private long id;
     private String title;
     private String artist;
@@ -8,7 +8,7 @@ class Song {
 
 
 
-    Song(long songID, String songTitle, String songArtist, boolean isChecked) {
+    public Song(long songID, String songTitle, String songArtist, boolean isChecked) {
         id = songID;
         title = songTitle;
         artist = songArtist;

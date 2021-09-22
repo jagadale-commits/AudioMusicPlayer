@@ -1,7 +1,6 @@
 package com.onnet.audiomusicplayer;
 
 import android.content.ContentResolver;
-import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
@@ -17,19 +16,22 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.MediaController;
 
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.onnet.audiomusicplayer.adapters.SongAdapter;
+import com.onnet.audiomusicplayer.lib.PreferenceHandler;
+import com.onnet.audiomusicplayer.lib.Song;
+import com.onnet.audiomusicplayer.lib.Utils;
+
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 
 
 public class AddPlayListActivity extends AppCompatActivity {
 
-    private String TAG = this.getClass().getSimpleName();
+    private final String TAG = this.getClass().getSimpleName();
 
     private ArrayList<Song> songsList;
     ListView lvAudioFiles;
@@ -51,37 +53,31 @@ public class AddPlayListActivity extends AppCompatActivity {
         etPlaylistName = findViewById(R.id.playlistname);
 
 
-        btnNext.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                playListName = etPlaylistName.getText().toString();
-                if (playListName.equals("")) {
-                    Utils.showToast(getApplicationContext(), "Enter playlist name");
-                } else {
-                    InputMethodManager imm = (InputMethodManager)getSystemService(INPUT_METHOD_SERVICE);
-                    imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
+        btnNext.setOnClickListener(view -> {
+            playListName = etPlaylistName.getText().toString();
+            if (playListName.equals("")) {
+                Utils.showToast(getApplicationContext(), "Enter playlist name");
+            } else {
+                InputMethodManager imm = (InputMethodManager)getSystemService(INPUT_METHOD_SERVICE);
+                imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
 
-                    llFirst.setVisibility(View.GONE);
-                    lvAudioFiles.setVisibility(View.VISIBLE);
-                    btnDone.setVisibility(View.VISIBLE);
-                }
-
-
+                llFirst.setVisibility(View.GONE);
+                lvAudioFiles.setVisibility(View.VISIBLE);
+                btnDone.setVisibility(View.VISIBLE);
             }
+
+
         });
 
-        btnDone.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                ArrayList<Song> selectedSongs = ((SongAdapter) lvAudioFiles.getAdapter()).getSelectedItems();
-                if (selectedSongs.size() == 0) {
-                    Utils.showToast(getApplicationContext(), "Please select, atleast one song");
-                } else {
-                    PreferenceHandler.savePlayList(playListName, selectedSongs);
-                    Log.i(TAG, "onClick: total no of selected files: " + selectedSongs.size());
-                    Utils.showToast(getApplicationContext(), "Playlist " + playListName + " created.");
-                    finish();
-                }
+        btnDone.setOnClickListener(view -> {
+            ArrayList<Song> selectedSongs = ((SongAdapter) lvAudioFiles.getAdapter()).getSelectedItems();
+            if (selectedSongs.size() == 0) {
+                Utils.showToast(getApplicationContext(), "Please select, atleast one song");
+            } else {
+                PreferenceHandler.savePlayList(playListName, selectedSongs);
+                Log.i(TAG, "onClick: total no of selected files: " + selectedSongs.size());
+                Utils.showToast(getApplicationContext(), "Playlist " + playListName + " created.");
+                finish();
             }
         });
 
@@ -135,7 +131,7 @@ public class AddPlayListActivity extends AppCompatActivity {
     public void displayAllSongsList() {
         songsList = new ArrayList<>();
         getSongList();
-        Collections.sort(songsList, Comparator.comparing(Song::getTitle));
+        songsList.sort(Comparator.comparing(Song::getTitle));
         SongAdapter songAdapter = new SongAdapter(this, songsList);
         lvAudioFiles.setAdapter(songAdapter);
     }

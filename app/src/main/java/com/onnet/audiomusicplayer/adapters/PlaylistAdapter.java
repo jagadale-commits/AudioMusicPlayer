@@ -1,4 +1,4 @@
-package com.onnet.audiomusicplayer;
+package com.onnet.audiomusicplayer.adapters;
 
 import android.content.Context;
 import android.content.Intent;
@@ -14,18 +14,26 @@ import android.widget.TextView;
 
 import androidx.appcompat.widget.PopupMenu;
 
+import com.onnet.audiomusicplayer.AddSongActivity;
+import com.onnet.audiomusicplayer.MainActivity;
+import com.onnet.audiomusicplayer.lib.PreferenceHandler;
+import com.onnet.audiomusicplayer.R;
+import com.onnet.audiomusicplayer.lib.Song;
+import com.onnet.audiomusicplayer.ViewPlayListActivity;
+import com.onnet.audiomusicplayer.services.MusicService;
+
 import java.util.ArrayList;
 
-class PlaylistAdapter extends BaseAdapter {
+public class PlaylistAdapter extends BaseAdapter {
 
-    private String TAG = this.getClass().getSimpleName();
+    private final String TAG = this.getClass().getSimpleName();
     private final ArrayList<String> playlistNames;
     private final ArrayList<Song> songsArrayList;
     private final LayoutInflater songInf;
     Context mContext;
     ViewHolder viewHolder;
 
-    PlaylistAdapter(Context c, ArrayList<String> theSongs, ArrayList<Song> songArrayList) {
+    public PlaylistAdapter(Context c, ArrayList<String> theSongs, ArrayList<Song> songArrayList) {
         playlistNames = theSongs;
         this.songsArrayList = songArrayList;
         songInf = LayoutInflater.from(c);
@@ -84,19 +92,16 @@ class PlaylistAdapter extends BaseAdapter {
 
 
         View finalConvertView = convertView;
-        viewHolder.ivMoreAction.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Log.i(TAG, "onClick: called: " + position);
-                showPopMenu(finalConvertView, position);
-            }
+        viewHolder.ivMoreAction.setOnClickListener(view -> {
+            Log.i(TAG, "onClick: called: " + position);
+            showPopMenu(finalConvertView, position);
         });
         return convertView;
     }
 
 
 
-    public class ViewHolder {
+    public static class ViewHolder {
         TextView songView;
         ImageView ivMoreAction;
         RelativeLayout rlRoot;
@@ -118,33 +123,29 @@ class PlaylistAdapter extends BaseAdapter {
             public boolean onMenuItemClick(MenuItem item) {
                 int i = item.getItemId();
                 if (i == R.id.play) {
-                    //do something
                     Log.i(TAG, "onMenuItemClick: play: " + position);
                     ArrayList<Song> songsList = PreferenceHandler.getPlayList(playlistNames.get(position));
                     musicService.setSongsList(songsList, 0);
                     musicService.playSong();
 
-                    if (onPlayClicklistener == null) {
+                    if (null == onPlayClicklistener) {
                         onPlayClicklistener.onPlayClick(position);
                     }
 
                     return true;
                 } else if (i == R.id.view) {
-                    //do something
                     Log.i(TAG, "onMenuItemClick: view: " + position);
                     Intent intent = new Intent(mContext, ViewPlayListActivity.class);
                     intent.putExtra("name", playlistNames.get(position));
                     mContext.startActivity(intent);
                     return true;
                 } else if (i == R.id.delete) {
-                    //do something
                     PreferenceHandler.removePlayList(playlistNames.get(position));
                     playlistNames.remove(position);
                     notifyDataSetChanged();
                     Log.i(TAG, "onMenuItemClick: delete" + position);
                     return true;
                 } else if (i == R.id.add) {
-                    //do something
                     Intent intent = new Intent(mContext, AddSongActivity.class);
                     intent.putExtra("name", playlistNames.get(position));
                     mContext.startActivity(intent);
@@ -165,7 +166,7 @@ class PlaylistAdapter extends BaseAdapter {
     }
 
     public interface OnPlayClicklistener {
-        public void onPlayClick(int position);
+        void onPlayClick(int position);
     }
 
 }

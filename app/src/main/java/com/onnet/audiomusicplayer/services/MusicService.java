@@ -1,12 +1,14 @@
-package com.onnet.audiomusicplayer;
+package com.onnet.audiomusicplayer.services;
 
-import android.app.Notification;
+
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.app.Service;
+import android.content.BroadcastReceiver;
 import android.content.ContentUris;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
@@ -17,10 +19,16 @@ import android.os.PowerManager;
 import android.util.Log;
 
 import androidx.annotation.RequiresApi;
-import androidx.core.app.NotificationCompat;
+
+import com.onnet.audiomusicplayer.lib.CreateNotification;
+import com.onnet.audiomusicplayer.MainActivity;
+import com.onnet.audiomusicplayer.lib.PreferenceHandler;
+import com.onnet.audiomusicplayer.lib.Song;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+
+import static com.onnet.audiomusicplayer.lib.CreateNotification.createNotification;
 
 public class MusicService extends Service implements MediaPlayer.OnPreparedListener, MediaPlayer.OnErrorListener,
         MediaPlayer.OnCompletionListener {
@@ -28,13 +36,13 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
     public static final String CHANNEL_ID = "ForegroundServiceChannel";
     private final String TAG = this.getClass().getSimpleName();
 
-    private String songTitle = "";
-    private static final int NOTIFY_ID = 123;
+    public static String songTitle = "";
     private MediaPlayer player;
-    private ArrayList<Song> songs;
-    private int songPosn;
+    public static ArrayList<Song> songs;
+    public static int songPosn;
     private final IBinder musicBind = new MusicBinder();
     MainActivity mainActivity;
+    
 
     @Override
     public void onCreate() {
@@ -42,34 +50,24 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         Log.i(TAG, "onCreate: called");
         songPosn = 0;
         initMusicPlayer();
+        createNotificationChannel();
+        registerReceiver(broadcastReceiver, new IntentFilter("TRACKS_TRACKS"));
+        startService(new Intent(getBaseContext(), OnClearFromRecentService.class));
+    }
+    private void createNotificationChannel() {
+        NotificationChannel serviceChannel = new NotificationChannel(
+                CHANNEL_ID,
+                "Foreground Service Channel",
+                NotificationManager.IMPORTANCE_DEFAULT
+        );
+        NotificationManager manager = getSystemService(NotificationManager.class);
+        manager.createNotificationChannel(serviceChannel);
     }
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        String input = intent.getStringExtra("inputExtra");
-        createNotificationChannel();
-        Intent notificationIntent = new Intent(this, MainActivity.class);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this,
-                0, notificationIntent, 0);
-        Notification notification = new NotificationCompat.Builder(this, CHANNEL_ID)
-                .setContentTitle("Music Player")
-                .setContentText(input)
-                .setSmallIcon(R.drawable.play)
-                .setContentIntent(pendingIntent)
-                .build();
-        startForeground(NOTIFY_ID, notification);
         return START_NOT_STICKY;
     }
-    private void createNotificationChannel() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationChannel serviceChannel = new NotificationChannel(
-                    CHANNEL_ID,
-                    "Foreground Service Channel",
-                    NotificationManager.IMPORTANCE_DEFAULT
-            );
-            NotificationManager manager = getSystemService(NotificationManager.class);
-            manager.createNotificationChannel(serviceChannel);
-        }
-    }
+
     @Override
     public void onTaskRemoved(Intent rootIntent) {
 
@@ -102,8 +100,9 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         songPosn = pos;
     }
 
+
     public class MusicBinder extends Binder {
-        MusicService getService() {
+        public MusicService getService() {
             return MusicService.this;
         }
     }
@@ -129,9 +128,10 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         for(Song s : originalSongs)
             Allsong.add(s.getId());
         Song playSong = songs.get(songPosn);
-
         songTitle = playSong.getTitle();
         long currSong = playSong.getId();
+        createNotification(this, songs.get(songPosn), android.R.drawable.ic_media_pause);
+
        if(Allsong.contains(currSong)) {
            try {
                Uri trackUri = ContentUris.withAppendedId(
@@ -194,6 +194,8 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
     }
 
     public void pausePlayer() {
+
+        createNotification(this, songs.get(songPosn), android.R.drawable.ic_media_play);
         player.pause();
     }
 
@@ -204,6 +206,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
 
     public void go() {
         player.start();
+        createNotification(this, songs.get(songPosn), android.R.drawable.ic_media_pause);
     }
 
     public void playPrev() {
@@ -220,7 +223,6 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
     }
 
     public void playstop() {
-
         if (player.isPlaying()) {
             player.stop();
         }
@@ -229,5 +231,27 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
     public String getSongName() {
         return songTitle;
     }
+    BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getExtras().getString("actionname");
+
+            switch (action){
+                case CreateNotification.ACTION_PREVIUOS:
+                    playPrev();
+                    break;
+                case CreateNotification.ACTION_PLAY:
+                    if (isPng()){
+                        pausePlayer();
+                    } else {
+                        go();
+                    }
+                    break;
+                case CreateNotification.ACTION_NEXT:
+                    playNext();
+                    break;
+            }
+        }
+    };
 
 }

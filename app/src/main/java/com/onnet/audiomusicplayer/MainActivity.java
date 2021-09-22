@@ -1,7 +1,6 @@
 package com.onnet.audiomusicplayer;
 
 import android.app.Activity;
-import android.app.PendingIntent;
 import android.content.ComponentName;
 import android.content.ContentResolver;
 import android.content.Context;
@@ -17,9 +16,7 @@ import android.os.IBinder;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -33,8 +30,11 @@ import android.widget.TextView;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
-import androidx.core.app.NotificationCompat;
-import androidx.core.app.NotificationManagerCompat;
+
+import com.onnet.audiomusicplayer.adapters.PlaylistAdapter;
+import com.onnet.audiomusicplayer.lib.PreferenceHandler;
+import com.onnet.audiomusicplayer.lib.Song;
+import com.onnet.audiomusicplayer.services.MusicService;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -45,7 +45,7 @@ import java.util.concurrent.TimeUnit;
 public class MainActivity extends AppCompatActivity implements MediaPlayerControl {
 
     private static final int READ_STORAGE_PERMISSION_REQUEST_CODE = 41 ;
-    private String TAG = this.getClass().getSimpleName();
+    private final String TAG = this.getClass().getSimpleName();
 
     private boolean paused;
     private boolean playbackPaused;
@@ -78,11 +78,11 @@ public class MainActivity extends AppCompatActivity implements MediaPlayerContro
             startActivity(intent);
         }else
         {
-          setLayout();
+            setLayout();
         }
 
-
     }
+
     public void setLayout()
     {
         llError = findViewById(R.id.errorlayout);
@@ -100,15 +100,12 @@ public class MainActivity extends AppCompatActivity implements MediaPlayerContro
         tvError = findViewById(R.id.error);
         songList = new ArrayList<>();
         getSongList();
-        Collections.sort(songList, Comparator.comparing(Song::getTitle));
+        songList.sort(Comparator.comparing(Song::getTitle));
         PreferenceHandler.savePlayList("모든 노래", songList);
         fetchPlayList();
-        btnAddPlaylist.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(MainActivity.this, AddPlayListActivity.class);
-                startActivity(intent);
-            }
+        btnAddPlaylist.setOnClickListener(view -> {
+            Intent intent = new Intent(MainActivity.this, AddPlayListActivity.class);
+            startActivity(intent);
         });
 
         seekBarHandler.postDelayed(seekRunnable, 1000);
@@ -133,53 +130,37 @@ public class MainActivity extends AppCompatActivity implements MediaPlayerContro
             }
         });
 
-        songListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+        songListView.setOnItemClickListener((adapterView, view, i, l) -> {
 
 
-                Intent intent = new Intent(MainActivity.this, ViewPlayListActivity.class);
-                intent.putExtra("name", playList.get(i));
-                startActivity(intent);
+            Intent intent = new Intent(MainActivity.this, ViewPlayListActivity.class);
+            intent.putExtra("name", playList.get(i));
+            startActivity(intent);
 
-            }
         });
 
 
-        ivPlayPause.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (musicSrv.isPng()) {
-                    musicSrv.pausePlayer();
-                    ivPlayPause.setImageResource(android.R.drawable.ic_media_play);
-                } else {
-                    musicSrv.go();
-                    ivPlayPause.setImageResource(android.R.drawable.ic_media_pause);
-                }
+        ivPlayPause.setOnClickListener(view -> {
+            if (musicSrv.isPng()) {
+                musicSrv.pausePlayer();
+                ivPlayPause.setImageResource(android.R.drawable.ic_media_play);
+            } else {
+                musicSrv.go();
+                ivPlayPause.setImageResource(android.R.drawable.ic_media_pause);
             }
         });
 
-        ivNext.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                playNext();
-            }
-        });
+        ivNext.setOnClickListener(view -> playNext());
 
-        ivPrev.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                playPrev();
-            }
-        });
+        ivPrev.setOnClickListener(view -> playPrev());
     }
     @Override
     public void onRequestPermissionsResult(int requestCode,
-                                           String permissions[], int[] grantResults) {
+                                           String[] permissions, int[] grantResults) {
         if (requestCode == READ_STORAGE_PERMISSION_REQUEST_CODE) {
             if (grantResults.length > 0
                     && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-               setLayout();
+                setLayout();
             } else {
                 try {
                     requestPermissionForReadExtertalStorage(this);
@@ -211,7 +192,7 @@ public class MainActivity extends AppCompatActivity implements MediaPlayerContro
     protected void onResume() {
         super.onResume();
         if (checkPermissionForReadExtertalStorage(this))
-        fetchPlayList();
+            fetchPlayList();
         if (paused) {
             paused = false;
         }
@@ -225,8 +206,6 @@ public class MainActivity extends AppCompatActivity implements MediaPlayerContro
     Handler seekBarHandler = new Handler();
 
     public void updateController() {
-
-        displayNotification();
         long millis = musicSrv.getDur();
         ivPlayPause.setImageResource(android.R.drawable.ic_media_pause);
         seekBar.setMax((int) millis);
@@ -327,11 +306,8 @@ public class MainActivity extends AppCompatActivity implements MediaPlayerContro
     };
 
     public boolean checkPermissionForReadExtertalStorage(Context context) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            int result = context.checkSelfPermission(android.Manifest.permission.READ_EXTERNAL_STORAGE);
-            return result == PackageManager.PERMISSION_GRANTED;
-        }
-        return false;
+        int result = context.checkSelfPermission(android.Manifest.permission.READ_EXTERNAL_STORAGE);
+        return result == PackageManager.PERMISSION_GRANTED;
     }
 
     public void requestPermissionForReadExtertalStorage(Context context) throws Exception {
@@ -427,7 +403,6 @@ public class MainActivity extends AppCompatActivity implements MediaPlayerContro
         playList = PreferenceHandler.getAllKeys();
         if (playList.size() == 0) {
             tvError.setVisibility(View.VISIBLE);
-//            songListView.setVisibility(View.GONE);
         } else {
             Collections.sort(playList);
             ArrayAdapter<String> aa = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, playList);
@@ -436,42 +411,12 @@ public class MainActivity extends AppCompatActivity implements MediaPlayerContro
                 playlistAdapter.setMusicService(musicSrv);
             }
 
-            playlistAdapter.setOnPlayClickListener(new PlaylistAdapter.OnPlayClicklistener() {
-                @Override
-                public void onPlayClick(int position) {
-                    int duration = musicSrv.getDur();
-                    Log.i(TAG, "onPlayClick: " + duration);
-                }
+            playlistAdapter.setOnPlayClickListener(position -> {
+                int duration = musicSrv.getDur();
+                Log.i(TAG, "onPlayClick: " + duration);
             });
             songListView.setAdapter(playlistAdapter);
         }
     }
-
-
-    String CHANNEL_ID = "MusicPlayer";
-    int notificationId = 1234;
-
-    public void displayNotification() {
-
-        Log.i(TAG, "displayNotification: called");
-        // Create an explicit intent for an Activity in your app
-        Intent intent = new Intent(this, MainActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, 0);
-
-
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, CHANNEL_ID)
-                .setSmallIcon(R.drawable.icon)
-                .setContentTitle(getString(R.string.NotificationTitle))
-                .setContentText(getString(R.string.notificationtext))
-                .setPriority(NotificationCompat.PRIORITY_HIGH)
-                // Set the intent that will fire when the user taps the notification
-                .setContentIntent(pendingIntent)
-                .setAutoCancel(true);
-
-        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
-        notificationManager.notify(notificationId, builder.build());
-    }
-
 
 }

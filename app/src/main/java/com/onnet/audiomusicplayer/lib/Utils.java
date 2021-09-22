@@ -1,4 +1,4 @@
-package com.onnet.audiomusicplayer;
+package com.onnet.audiomusicplayer.lib;
 
 import android.content.Context;
 import android.widget.Toast;

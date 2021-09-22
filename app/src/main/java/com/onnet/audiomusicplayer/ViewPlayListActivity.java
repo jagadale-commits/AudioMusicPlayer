@@ -3,26 +3,21 @@ package com.onnet.audiomusicplayer;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.RelativeLayout;
 
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.onnet.audiomusicplayer.adapters.songPlaylistAdapter;
+import com.onnet.audiomusicplayer.lib.PreferenceHandler;
+import com.onnet.audiomusicplayer.lib.Song;
+
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
 
 
 public class ViewPlayListActivity extends AppCompatActivity {
-
-    private String TAG = this.getClass().getSimpleName();
 
     ListView songFiles;
 
@@ -41,13 +36,10 @@ public class ViewPlayListActivity extends AppCompatActivity {
         playListName = getIntent().getStringExtra("name");
         if(!playListName.equals("모든 노래"))
             addbtn.setVisibility(View.VISIBLE);
-        addbtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(getApplicationContext() , AddSongActivity.class);
-                intent.putExtra("name", playListName);
-                startActivity(intent);
-            }
+        addbtn.setOnClickListener(view -> {
+            Intent intent = new Intent(getApplicationContext() , AddSongActivity.class);
+            intent.putExtra("name", playListName);
+            startActivity(intent);
         });
 
 

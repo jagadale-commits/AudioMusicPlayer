@@ -1,13 +1,7 @@
-package com.onnet.audiomusicplayer;
+package com.onnet.audiomusicplayer.adapters;
 
-import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
-import android.media.AudioManager;
-import android.media.MediaPlayer;
-import android.net.Uri;
-import android.os.Parcelable;
-import android.os.PowerManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -20,20 +14,26 @@ import android.widget.TextView;
 
 import androidx.appcompat.widget.PopupMenu;
 
+import com.onnet.audiomusicplayer.MainActivity;
+import com.onnet.audiomusicplayer.lib.PreferenceHandler;
+import com.onnet.audiomusicplayer.R;
+import com.onnet.audiomusicplayer.lib.Song;
+import com.onnet.audiomusicplayer.ViewPlayListActivity;
+
 import java.util.ArrayList;
 
 import static com.onnet.audiomusicplayer.MainActivity.musicSrv;
 
-class songPlaylistAdapter extends BaseAdapter {
+public class songPlaylistAdapter extends BaseAdapter {
 
     private final String playlistName;
-    private String TAG = this.getClass().getSimpleName();
+    private final String TAG = this.getClass().getSimpleName();
     private final ArrayList<Song> songsArrayList;
     private final LayoutInflater songInf;
     Context mContext;
     ViewHolder viewHolder;
 
-    songPlaylistAdapter(Context c, String playlistName, ArrayList<Song> songArrayList) {
+    public songPlaylistAdapter(Context c, String playlistName, ArrayList<Song> songArrayList) {
         this.playlistName = playlistName;
         this.songsArrayList = songArrayList;
         songInf = LayoutInflater.from(c);
@@ -81,30 +81,24 @@ class songPlaylistAdapter extends BaseAdapter {
 
 
         View finalConvertView = convertView;
-        viewHolder.songView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if(musicSrv!=null) {
-                    musicSrv.setSongsList(songsArrayList, position);
-                    musicSrv.playSong();
-                }
-                Intent intent = new Intent(mContext, MainActivity.class);
-                mContext.startActivity(intent);
+        viewHolder.songView.setOnClickListener(view -> {
+            if(musicSrv!=null) {
+                musicSrv.setSongsList(songsArrayList, position);
+                musicSrv.playSong();
             }
+            Intent intent = new Intent(mContext, MainActivity.class);
+            mContext.startActivity(intent);
         });
-        viewHolder.ivMoreAction.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Log.i(TAG, "onClick: called: " + position);
-                showPopMenu(finalConvertView, position);
-            }
+        viewHolder.ivMoreAction.setOnClickListener(view -> {
+            Log.i(TAG, "onClick: called: " + position);
+            showPopMenu(finalConvertView, position);
         });
         return convertView;
     }
 
 
 
-    public class ViewHolder {
+    public static class ViewHolder {
         TextView songView;
         ImageView ivMoreAction;
         RelativeLayout rlRoot;

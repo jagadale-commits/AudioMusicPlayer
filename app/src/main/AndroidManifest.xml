@@ -17,7 +17,7 @@
         <activity android:name=".AddSongActivity" />
 
         <service
-            android:name=".MusicService"
+            android:name=".services.MusicService"
             android:enabled="true"
             android:exported="false"
             android:stopWithTask="false" />
@@ -41,6 +41,10 @@
         <activity
             android:name=".ViewPlayListActivity"
             android:label="재생 목록" />
+
+        <receiver android:name=".services.MusicService" />
+        <receiver android:name=".services.NotificationActionService"/>
+        <service android:name=".services.OnClearFromRecentService"/>
     </application>
 
 </manifest>

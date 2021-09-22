@@ -1,23 +1,19 @@
 package com.onnet.audiomusicplayer;
 
+import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.net.Uri;
+import android.os.Bundle;
+import android.provider.Settings;
+import android.widget.Button;
+import android.widget.TextView;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
-
-import android.Manifest;
-import android.app.Activity;
-import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.net.Uri;
-import android.os.Build;
-import android.os.Bundle;
-import android.provider.Settings;
-import android.view.View;
-import android.widget.Button;
-import android.widget.TextView;
 
 public class PermissionActivity extends AppCompatActivity {
     private static final int READ_STORAGE_PERMISSION_REQUEST_CODE = 41;
@@ -29,34 +25,21 @@ public class PermissionActivity extends AppCompatActivity {
         setContentView(R.layout.activity_permission);
         tvError = findViewById(R.id.textView);
         btnPermission = findViewById(R.id.buttonP);
-        btnPermission.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                new AlertDialog.Builder(PermissionActivity.this)
-                        .setTitle("필요한 권한")
-                        .setMessage("권한을 활성화하려면 아래 단계를 따르십시오. \n" +
-                                "앱 사용 권한 클릭 \n" +
-                                "거부된 섹션의 파일 및 미디어를 클릭합니다.\n" +
-                                "미디어 전용 옵션에 대한 액세스 허용 설정")
-                        .setPositiveButton("그래", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                Intent intent = new Intent();
-                                intent.setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
-                                Uri uri = Uri.fromParts("package", PermissionActivity.this.getPackageName(), null);
-                                intent.setData(uri);
-                                PermissionActivity.this.startActivity(intent);
-                                finish();
-                            }
-                        })
-                        .setNegativeButton("취소", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                dialog.dismiss();
-                            }
-                        }).create().show();
-            }
-        });
+        btnPermission.setOnClickListener(view -> new AlertDialog.Builder(PermissionActivity.this)
+                .setTitle("필요한 권한")
+                .setMessage("권한을 활성화하려면 아래 단계를 따르십시오. \n" +
+                        "앱 사용 권한 클릭 \n" +
+                        "거부된 섹션의 파일 및 미디어를 클릭합니다.\n" +
+                        "미디어 전용 옵션에 대한 액세스 허용 설정")
+                .setPositiveButton("그래", (dialog, which) -> {
+                    Intent intent = new Intent();
+                    intent.setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+                    Uri uri = Uri.fromParts("package", PermissionActivity.this.getPackageName(), null);
+                    intent.setData(uri);
+                    PermissionActivity.this.startActivity(intent);
+                    finish();
+                })
+                .setNegativeButton("취소", (dialog, which) -> dialog.dismiss()).create().show());
         if (!checkPermissionForReadExtertalStorage(this)) {
                 requestPermissionForReadExtertalStorage(this);
 
@@ -81,11 +64,8 @@ public class PermissionActivity extends AppCompatActivity {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
     public boolean checkPermissionForReadExtertalStorage(Context context) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            int result = context.checkSelfPermission(android.Manifest.permission.READ_EXTERNAL_STORAGE);
-            return result == PackageManager.PERMISSION_GRANTED;
-        }
-        return false;
+        int result = context.checkSelfPermission(android.Manifest.permission.READ_EXTERNAL_STORAGE);
+        return result == PackageManager.PERMISSION_GRANTED;
     }
 
     public void requestPermissionForReadExtertalStorage(Context context) {
