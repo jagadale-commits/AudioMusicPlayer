@@ -11,24 +11,21 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.IBinder;
 import android.provider.MediaStore;
 import android.view.Menu;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.MediaController.MediaPlayerControl;
-import android.widget.SeekBar;
 import android.widget.TextView;
 
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
 import com.onnet.audiomusicplayer.adapters.PlaylistAdapter;
 import com.onnet.audiomusicplayer.lib.PreferenceHandler;
@@ -38,29 +35,27 @@ import com.onnet.audiomusicplayer.services.MusicService;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.concurrent.TimeUnit;
 
 
-public class MainActivity extends AppCompatActivity implements MediaPlayerControl {
+public class MainActivity extends AppCompatActivity {
 
     private static final int READ_STORAGE_PERMISSION_REQUEST_CODE = 41 ;
 
     public static MusicService musicSrv;
     private Intent playIntent;
-    private boolean musicBound = false;
+    public static boolean musicBound = false;
     private ArrayList<Song> songList;
 
     ListView songListView;
     LinearLayout llError;
     Button btnAddPlaylist;
 
-    TextView tvError, tvSongTitle;
-    ImageView ivPlayPause, ivNext, ivPrev;
-    SeekBar seekBar;
-    TextView tvEndTime, tvStartTime;
+    TextView tvError;
+
     ArrayList<String> playList;
     PlaylistAdapter playlistAdapter;
-    private boolean playbackPaused;
+    public static boolean playbackPaused;
+    public final seekbarFragment seekbarfragment = new seekbarFragment();
 
     @RequiresApi(api = Build.VERSION_CODES.Q)
     @Override
@@ -68,31 +63,22 @@ public class MainActivity extends AppCompatActivity implements MediaPlayerContro
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         PreferenceHandler.init(this);
-
-        if (!checkPermissionForReadExtertalStorage(this)) {
-            Intent intent = new Intent(MainActivity.this, PermissionActivity.class);
-            startActivity(intent);
-        }else
-        {
-          setLayout();
+        if (savedInstanceState == null) {
+            FragmentManager fm = getSupportFragmentManager();
+            FragmentTransaction fragmentTransaction = fm.beginTransaction();
+            fragmentTransaction.replace(R.id.fragment_container_view, seekbarfragment);
+            fragmentTransaction.commit();
         }
-
+          setLayout();
     }
 
     public void setLayout()
     {
+
         llError = findViewById(R.id.errorlayout);
         songListView = findViewById(R.id.song_list);
 
         btnAddPlaylist = findViewById(R.id.addplaylist);
-
-        ivPlayPause = findViewById(R.id.playpause);
-        ivNext = findViewById(R.id.next);
-        ivPrev = findViewById(R.id.prev);
-        seekBar = findViewById(R.id.seekbar);
-        tvStartTime = findViewById(R.id.starttime);
-        tvEndTime = findViewById(R.id.endtime);
-        tvSongTitle = findViewById(R.id.songname);
         tvError = findViewById(R.id.error);
 
         songList = new ArrayList<>();
@@ -100,75 +86,21 @@ public class MainActivity extends AppCompatActivity implements MediaPlayerContro
         Collections.sort(songList, Comparator.comparing(Song::getTitle));
         PreferenceHandler.savePlayList("모든 노래", songList);
         fetchPlayList();
-        btnAddPlaylist.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(MainActivity.this, AddPlayListActivity.class);
-                startActivity(intent);
-            }
-        });
-
-        seekBarHandler.postDelayed(seekRunnable, 1000);
-
-        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-
-            }
-
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
-
-            }
-
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                if(musicSrv.isPng() && fromUser){
-                    musicSrv.seek(progress);
-                }
-            }
-        });
-
-        songListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-
-
-                Intent intent = new Intent(MainActivity.this, ViewPlayListActivity.class);
-                intent.putExtra("name", playList.get(i));
-                startActivity(intent);
-
-            }
+        btnAddPlaylist.setOnClickListener(view -> {
+            Intent intent = new Intent(MainActivity.this, AddPlayListActivity.class);
+            startActivity(intent);
         });
 
 
-        ivPlayPause.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (musicSrv.isPng()) {
-                    musicSrv.pausePlayer();
-                    ivPlayPause.setImageResource(android.R.drawable.ic_media_play);
-                } else {
-                    musicSrv.go();
-                    ivPlayPause.setImageResource(android.R.drawable.ic_media_pause);
-                }
-            }
+        songListView.setOnItemClickListener((adapterView, view, i, l) -> {
+
+
+            Intent intent = new Intent(MainActivity.this, ViewPlayListActivity.class);
+            intent.putExtra("name", playList.get(i));
+            startActivity(intent);
+
         });
 
-        ivNext.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                playNext();
-            }
-        });
-
-        ivPrev.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                playPrev();
-            }
-        });
     }
     @Override
     public void onRequestPermissionsResult(int requestCode,
@@ -212,64 +144,6 @@ public class MainActivity extends AppCompatActivity implements MediaPlayerContro
     @Override
     protected void onStop() {
         super.onStop();
-    }
-
-    Handler seekBarHandler = new Handler();
-
-    public void updateController() {
-        long millis = musicSrv.getDur();
-        ivPlayPause.setImageResource(android.R.drawable.ic_media_pause);
-        seekBar.setMax((int) millis);
-        String ms = String.format("%02d:%02d",
-                TimeUnit.MILLISECONDS.toMinutes(millis) - TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(millis)),
-                TimeUnit.MILLISECONDS.toSeconds(millis) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(millis)));
-        tvEndTime.setText(ms);
-    }
-
-    Runnable seekRunnable = new Runnable() {
-        @Override
-        public void run() {
-
-            if (musicSrv.isPng()) {
-                long currentPos = musicSrv.getPosn();
-                long duration = musicSrv.getDur();
-                String durMS = convertMillisToMS(duration);
-                String ms = convertMillisToMS(currentPos);
-                tvStartTime.setText(ms);
-                tvEndTime.setText(durMS);
-                seekBar.setMax((int) duration);
-                seekBar.setProgress((int) currentPos);
-                ivPlayPause.setImageResource(android.R.drawable.ic_media_pause);
-                tvSongTitle.setText(musicSrv.getSongName());
-//                Log.i(TAG, "run: " + currentPos + " MS: " + ms);
-            } else {
-                ivPlayPause.setImageResource(android.R.drawable.ic_media_play);
-            }
-
-            seekBarHandler.postDelayed(this, 1000);
-
-        }
-    };
-
-    public String convertMillisToMS(long millis) {
-        return String.format("%02d:%02d",
-                TimeUnit.MILLISECONDS.toMinutes(millis) - TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(millis)),
-                TimeUnit.MILLISECONDS.toSeconds(millis) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(millis)));
-    }
-
-
-    private void playNext() {
-        musicSrv.playNext();
-        if (playbackPaused) {
-            playbackPaused = false;
-        }
-    }
-
-    private void playPrev() {
-        musicSrv.playPrev();
-        if (playbackPaused) {
-            playbackPaused = false;
-        }
     }
 
 
@@ -340,70 +214,8 @@ public class MainActivity extends AppCompatActivity implements MediaPlayerContro
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        seekBarHandler.removeCallbacks(seekRunnable);
-
+        seekbarfragment.seekBarHandler.removeCallbacks(seekbarfragment.seekRunnable);
     }
-
-    @Override
-    public void pause() {
-        playbackPaused = true;
-        musicSrv.pausePlayer();
-    }
-
-    @Override
-    public void seekTo(int pos) {
-        musicSrv.seek(pos);
-    }
-
-    @Override
-    public void start() {
-        musicSrv.go();
-    }
-
-    @Override
-    public int getDuration() {
-        if (musicSrv != null && musicBound && musicSrv.isPng())
-            return musicSrv.getDur();
-        else return 0;
-    }
-
-    @Override
-    public int getCurrentPosition() {
-        if (musicSrv != null && musicBound && musicSrv.isPng())
-            return musicSrv.getPosn();
-        else return 0;
-    }
-
-    @Override
-    public boolean isPlaying() {
-        return musicSrv != null && musicBound && musicSrv.isPng();
-    }
-
-    @Override
-    public int getBufferPercentage() {
-        return 0;
-    }
-
-    @Override
-    public boolean canPause() {
-        return true;
-    }
-
-    @Override
-    public boolean canSeekBackward() {
-        return true;
-    }
-
-    @Override
-    public boolean canSeekForward() {
-        return true;
-    }
-
-    @Override
-    public int getAudioSessionId() {
-        return 0;
-    }
-
 
 
     public void fetchPlayList() {

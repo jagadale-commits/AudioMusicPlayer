@@ -19,6 +19,9 @@ import android.widget.ListView;
 
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
 import com.onnet.audiomusicplayer.adapters.SongAdapter;
 import com.onnet.audiomusicplayer.lib.PreferenceHandler;
@@ -39,11 +42,19 @@ public class AddPlayListActivity extends AppCompatActivity {
     Button btnNext, btnDone;
     EditText etPlaylistName;
     String playListName;
+    public final seekbarFragment seekbarfragment = new seekbarFragment();
+
 
     @RequiresApi(api = Build.VERSION_CODES.Q)
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (savedInstanceState == null) {
+            FragmentManager fm = getSupportFragmentManager();
+            FragmentTransaction fragmentTransaction = fm.beginTransaction();
+            fragmentTransaction.replace(R.id.fragment_container_view, seekbarfragment);
+            fragmentTransaction.commit();
+        }
         setContentView(R.layout.activity_addplaylist);
 
         lvAudioFiles = findViewById(R.id.audiolistview);

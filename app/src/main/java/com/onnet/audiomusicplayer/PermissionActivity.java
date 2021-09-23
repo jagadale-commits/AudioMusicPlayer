@@ -22,6 +22,15 @@ public class PermissionActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (!checkPermissionForReadExtertalStorage(this)) {
+            requestPermissionForReadExtertalStorage(this);
+
+        }else
+        {
+            Intent intent = new Intent(this, MainActivity.class);
+            startActivity(intent);
+            finish();
+        }
         setContentView(R.layout.activity_permission);
         tvError = findViewById(R.id.textView);
         btnPermission = findViewById(R.id.buttonP);
@@ -40,15 +49,6 @@ public class PermissionActivity extends AppCompatActivity {
                     finish();
                 })
                 .setNegativeButton("취소", (dialog, which) -> dialog.dismiss()).create().show());
-        if (!checkPermissionForReadExtertalStorage(this)) {
-                requestPermissionForReadExtertalStorage(this);
-
-        }else
-        {
-            finish();
-            Intent intent = new Intent(this, MainActivity.class);
-            startActivity(intent);
-        }
     }
     @Override
     public void onRequestPermissionsResult(int requestCode,

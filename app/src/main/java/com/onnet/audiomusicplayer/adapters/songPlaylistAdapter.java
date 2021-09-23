@@ -86,8 +86,6 @@ public class songPlaylistAdapter extends BaseAdapter {
                 musicSrv.setSongsList(songsArrayList, position);
                 musicSrv.playSong();
             }
-            Intent intent = new Intent(mContext, MainActivity.class);
-            mContext.startActivity(intent);
         });
         viewHolder.ivMoreAction.setOnClickListener(view -> {
             Log.i(TAG, "onClick: called: " + position);
@@ -123,8 +121,6 @@ public class songPlaylistAdapter extends BaseAdapter {
                         musicSrv.setSongsList(songsArrayList, position);
                         musicSrv.playSong();
                     }
-                    Intent intent = new Intent(mContext, MainActivity.class);
-                    mContext.startActivity(intent);
                     return true;
                 } else{
                     return onMenuItemClick(item);

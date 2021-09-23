@@ -24,6 +24,7 @@ import com.onnet.audiomusicplayer.lib.CreateNotification;
 import com.onnet.audiomusicplayer.MainActivity;
 import com.onnet.audiomusicplayer.lib.PreferenceHandler;
 import com.onnet.audiomusicplayer.lib.Song;
+import com.onnet.audiomusicplayer.seekbarFragment;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -120,32 +121,32 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
     }
 
     public void playSong() {
+       if(songs!=null) {
+           playstop();
+           player.reset();
+           ArrayList<Song> originalSongs = PreferenceHandler.getPlayList("모든 노래");
+           HashSet<Long> Allsong = new HashSet<>();
+           for (Song s : originalSongs)
+               Allsong.add(s.getId());
+           Song playSong = songs.get(songPosn);
+           songTitle = playSong.getTitle();
+           long currSong = playSong.getId();
+           createNotification(this, songs.get(songPosn), android.R.drawable.ic_media_pause);
 
-        playstop();
-        player.reset();
-        ArrayList<Song> originalSongs = PreferenceHandler.getPlayList("모든 노래");
-        HashSet<Long> Allsong = new HashSet<>();
-        for(Song s : originalSongs)
-            Allsong.add(s.getId());
-        Song playSong = songs.get(songPosn);
-        songTitle = playSong.getTitle();
-        long currSong = playSong.getId();
-        createNotification(this, songs.get(songPosn), android.R.drawable.ic_media_pause);
-
-       if(Allsong.contains(currSong)) {
-           try {
-               Uri trackUri = ContentUris.withAppendedId(
-                       android.provider.MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
-                       currSong);
-               player.setDataSource(getApplicationContext(), trackUri);
-               player.prepareAsync();
-           } catch (Exception e) {
-               Log.e("MUSIC SERVICE", "Error setting data source", e);
+           if (Allsong.contains(currSong)) {
+               try {
+                   Uri trackUri = ContentUris.withAppendedId(
+                           android.provider.MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+                           currSong);
+                   player.setDataSource(getApplicationContext(), trackUri);
+                   player.prepareAsync();
+               } catch (Exception e) {
+                   Log.e("MUSIC SERVICE", "Error setting data source", e);
+               }
+           } else {
+               songs.remove(songPosn);
+               playNext();
            }
-       }
-       else {
-           songs.remove(songPosn);
-           playNext();
        }
 
     }
@@ -177,7 +178,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
     public void onPrepared(MediaPlayer mp) {
         mp.start();
         if (mainActivity != null) {
-            mainActivity.updateController();
+            mainActivity.seekbarfragment.updateController();
         }
     }
 
@@ -212,13 +213,13 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
 
     public void playPrev() {
         songPosn--;
-        if (songPosn < 0) songPosn = songs.size() - 1;
+        if (songs!=null && songPosn < 0) songPosn = songs.size() - 1;
         playSong();
     }
 
     public void playNext() {
         songPosn++;
-        if (songPosn >= songs.size())
+        if (songs!=null && songPosn >= songs.size())
             songPosn = 0;
         playSong();
     }

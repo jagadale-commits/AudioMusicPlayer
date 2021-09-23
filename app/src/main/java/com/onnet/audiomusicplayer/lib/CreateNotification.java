@@ -9,6 +9,7 @@ import android.support.v4.media.session.MediaSessionCompat;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 
+import com.onnet.audiomusicplayer.MainActivity;
 import com.onnet.audiomusicplayer.R;
 import com.onnet.audiomusicplayer.services.NotificationActionService;
 
@@ -51,14 +52,19 @@ public class CreateNotification {
                 intentNext, PendingIntent.FLAG_UPDATE_CURRENT);
         drw_next = android.R.drawable.ic_media_next;
 
+        Intent resultIntent = new Intent(context, MainActivity.class);
+        resultIntent.setAction(Intent.ACTION_MAIN);
+        resultIntent.addCategory(Intent.CATEGORY_LAUNCHER);
 
-        //create notification
+        PendingIntent clickIntent = PendingIntent.getActivity(context, 0,
+                resultIntent, 0);
+
         notification = new NotificationCompat.Builder(context, CHANNEL_ID)
                 .setSmallIcon(R.drawable.icon)
                 .setContentTitle(track.getTitle())
                 .setContentText(track.getArtist())
-                .setOnlyAlertOnce(true)//show notification for only first time
-                .setShowWhen(false)
+                .setContentIntent(clickIntent)
+                .setOngoing(true)
                 .addAction(drw_previous, "Previous", pendingIntentPrevious)
                 .addAction(playbutton, "Play", pendingIntentPlay)
                 .addAction(drw_next, "Next", pendingIntentNext)
@@ -67,7 +73,6 @@ public class CreateNotification {
                         .setMediaSession(mediaSessionCompat.getSessionToken()))
                 .setPriority(NotificationCompat.PRIORITY_LOW)
                 .build();
-
         notificationManagerCompat.notify(1, notification);
 
     }
