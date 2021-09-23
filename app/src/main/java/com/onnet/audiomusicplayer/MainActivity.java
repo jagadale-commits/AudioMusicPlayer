@@ -14,15 +14,14 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.provider.MediaStore;
-import android.util.Log;
 import android.view.Menu;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.MediaController;
 import android.widget.MediaController.MediaPlayerControl;
 import android.widget.SeekBar;
 import android.widget.TextView;
@@ -45,11 +44,7 @@ import java.util.concurrent.TimeUnit;
 public class MainActivity extends AppCompatActivity implements MediaPlayerControl {
 
     private static final int READ_STORAGE_PERMISSION_REQUEST_CODE = 41 ;
-    private final String TAG = this.getClass().getSimpleName();
 
-    private boolean paused;
-    private boolean playbackPaused;
-    private MediaController controller;
     public static MusicService musicSrv;
     private Intent playIntent;
     private boolean musicBound = false;
@@ -65,6 +60,7 @@ public class MainActivity extends AppCompatActivity implements MediaPlayerContro
     TextView tvEndTime, tvStartTime;
     ArrayList<String> playList;
     PlaylistAdapter playlistAdapter;
+    private boolean playbackPaused;
 
     @RequiresApi(api = Build.VERSION_CODES.Q)
     @Override
@@ -78,7 +74,7 @@ public class MainActivity extends AppCompatActivity implements MediaPlayerContro
             startActivity(intent);
         }else
         {
-            setLayout();
+          setLayout();
         }
 
     }
@@ -89,23 +85,27 @@ public class MainActivity extends AppCompatActivity implements MediaPlayerContro
         songListView = findViewById(R.id.song_list);
 
         btnAddPlaylist = findViewById(R.id.addplaylist);
+
         ivPlayPause = findViewById(R.id.playpause);
         ivNext = findViewById(R.id.next);
         ivPrev = findViewById(R.id.prev);
         seekBar = findViewById(R.id.seekbar);
         tvStartTime = findViewById(R.id.starttime);
         tvEndTime = findViewById(R.id.endtime);
-
         tvSongTitle = findViewById(R.id.songname);
         tvError = findViewById(R.id.error);
+
         songList = new ArrayList<>();
         getSongList();
-        songList.sort(Comparator.comparing(Song::getTitle));
+        Collections.sort(songList, Comparator.comparing(Song::getTitle));
         PreferenceHandler.savePlayList("모든 노래", songList);
         fetchPlayList();
-        btnAddPlaylist.setOnClickListener(view -> {
-            Intent intent = new Intent(MainActivity.this, AddPlayListActivity.class);
-            startActivity(intent);
+        btnAddPlaylist.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(MainActivity.this, AddPlayListActivity.class);
+                startActivity(intent);
+            }
         });
 
         seekBarHandler.postDelayed(seekRunnable, 1000);
@@ -130,37 +130,53 @@ public class MainActivity extends AppCompatActivity implements MediaPlayerContro
             }
         });
 
-        songListView.setOnItemClickListener((adapterView, view, i, l) -> {
+        songListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
 
 
-            Intent intent = new Intent(MainActivity.this, ViewPlayListActivity.class);
-            intent.putExtra("name", playList.get(i));
-            startActivity(intent);
+                Intent intent = new Intent(MainActivity.this, ViewPlayListActivity.class);
+                intent.putExtra("name", playList.get(i));
+                startActivity(intent);
 
-        });
-
-
-        ivPlayPause.setOnClickListener(view -> {
-            if (musicSrv.isPng()) {
-                musicSrv.pausePlayer();
-                ivPlayPause.setImageResource(android.R.drawable.ic_media_play);
-            } else {
-                musicSrv.go();
-                ivPlayPause.setImageResource(android.R.drawable.ic_media_pause);
             }
         });
 
-        ivNext.setOnClickListener(view -> playNext());
 
-        ivPrev.setOnClickListener(view -> playPrev());
+        ivPlayPause.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (musicSrv.isPng()) {
+                    musicSrv.pausePlayer();
+                    ivPlayPause.setImageResource(android.R.drawable.ic_media_play);
+                } else {
+                    musicSrv.go();
+                    ivPlayPause.setImageResource(android.R.drawable.ic_media_pause);
+                }
+            }
+        });
+
+        ivNext.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                playNext();
+            }
+        });
+
+        ivPrev.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                playPrev();
+            }
+        });
     }
     @Override
     public void onRequestPermissionsResult(int requestCode,
-                                           String[] permissions, int[] grantResults) {
+                                           String permissions[], int[] grantResults) {
         if (requestCode == READ_STORAGE_PERMISSION_REQUEST_CODE) {
             if (grantResults.length > 0
                     && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                setLayout();
+               setLayout();
             } else {
                 try {
                     requestPermissionForReadExtertalStorage(this);
@@ -174,7 +190,6 @@ public class MainActivity extends AppCompatActivity implements MediaPlayerContro
     @Override
     protected void onStart() {
         super.onStart();
-        Log.i(TAG, "onStart: called : playerIntent: " + playIntent + " Music connection: " + musicConnection);
         if (playIntent == null) {
             playIntent = new Intent(this, MusicService.class);
             bindService(playIntent, musicConnection, Context.BIND_AUTO_CREATE);
@@ -185,17 +200,13 @@ public class MainActivity extends AppCompatActivity implements MediaPlayerContro
     @Override
     protected void onPause() {
         super.onPause();
-        paused = true;
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         if (checkPermissionForReadExtertalStorage(this))
-            fetchPlayList();
-        if (paused) {
-            paused = false;
-        }
+        fetchPlayList();
     }
 
     @Override
@@ -213,7 +224,6 @@ public class MainActivity extends AppCompatActivity implements MediaPlayerContro
                 TimeUnit.MILLISECONDS.toMinutes(millis) - TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(millis)),
                 TimeUnit.MILLISECONDS.toSeconds(millis) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(millis)));
         tvEndTime.setText(ms);
-        Log.i(TAG, "showController: duration: " + musicSrv.getDur() + " " + ms);
     }
 
     Runnable seekRunnable = new Runnable() {
@@ -287,7 +297,6 @@ public class MainActivity extends AppCompatActivity implements MediaPlayerContro
     private final ServiceConnection musicConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
-            Log.i(TAG, "onServiceConnected: called");
             MusicService.MusicBinder binder = (MusicService.MusicBinder) service;
             musicSrv = binder.getService();
             if (playlistAdapter != null) {
@@ -300,14 +309,16 @@ public class MainActivity extends AppCompatActivity implements MediaPlayerContro
 
         @Override
         public void onServiceDisconnected(ComponentName name) {
-            Log.i(TAG, "onServiceDisconnected: called");
             musicBound = false;
         }
     };
 
     public boolean checkPermissionForReadExtertalStorage(Context context) {
-        int result = context.checkSelfPermission(android.Manifest.permission.READ_EXTERNAL_STORAGE);
-        return result == PackageManager.PERMISSION_GRANTED;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            int result = context.checkSelfPermission(android.Manifest.permission.READ_EXTERNAL_STORAGE);
+            return result == PackageManager.PERMISSION_GRANTED;
+        }
+        return false;
     }
 
     public void requestPermissionForReadExtertalStorage(Context context) throws Exception {
@@ -346,14 +357,11 @@ public class MainActivity extends AppCompatActivity implements MediaPlayerContro
 
     @Override
     public void start() {
-        Log.i(TAG, "start: ");
         musicSrv.go();
-        controller.show();
     }
 
     @Override
     public int getDuration() {
-        Log.i(TAG, "getDuration: ");
         if (musicSrv != null && musicBound && musicSrv.isPng())
             return musicSrv.getDur();
         else return 0;
@@ -361,7 +369,6 @@ public class MainActivity extends AppCompatActivity implements MediaPlayerContro
 
     @Override
     public int getCurrentPosition() {
-        Log.i(TAG, "getCurrentPosition: ");
         if (musicSrv != null && musicBound && musicSrv.isPng())
             return musicSrv.getPosn();
         else return 0;
@@ -411,10 +418,6 @@ public class MainActivity extends AppCompatActivity implements MediaPlayerContro
                 playlistAdapter.setMusicService(musicSrv);
             }
 
-            playlistAdapter.setOnPlayClickListener(position -> {
-                int duration = musicSrv.getDur();
-                Log.i(TAG, "onPlayClick: " + duration);
-            });
             songListView.setAdapter(playlistAdapter);
         }
     }

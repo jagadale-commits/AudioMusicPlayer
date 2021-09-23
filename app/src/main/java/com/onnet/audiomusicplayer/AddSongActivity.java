@@ -34,8 +34,7 @@ public class AddSongActivity extends AppCompatActivity {
 
     private ArrayList<Song> songsList;
     ListView lvAudioFiles;
-    LinearLayout llFirst;
-    Button btnNext, btnDone;
+    Button  btnDone;
     EditText etPlaylistName;
     String playListName;
     HashSet<Long> orginalIDs;
@@ -47,7 +46,6 @@ public class AddSongActivity extends AppCompatActivity {
         setContentView(R.layout.activity_add_song);
         playListName = getIntent().getStringExtra("name");
         lvAudioFiles = findViewById(R.id.audiolistview);
-        llFirst = findViewById(R.id.firstlayout);
         btnDone = findViewById(R.id.submit);
         etPlaylistName = findViewById(R.id.playlistname);
 

@@ -206,6 +206,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
 
     public void go() {
         player.start();
+        if(songs !=null)
         createNotification(this, songs.get(songPosn), android.R.drawable.ic_media_pause);
     }
 

@@ -47,7 +47,6 @@ public class AddPlayListActivity extends AppCompatActivity {
         setContentView(R.layout.activity_addplaylist);
 
         lvAudioFiles = findViewById(R.id.audiolistview);
-        llFirst = findViewById(R.id.firstlayout);
         btnNext = findViewById(R.id.next);
         btnDone = findViewById(R.id.submit);
         etPlaylistName = findViewById(R.id.playlistname);
@@ -61,7 +60,8 @@ public class AddPlayListActivity extends AppCompatActivity {
                 InputMethodManager imm = (InputMethodManager)getSystemService(INPUT_METHOD_SERVICE);
                 imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
 
-                llFirst.setVisibility(View.GONE);
+                btnNext.setVisibility(View.GONE);
+                etPlaylistName.setVisibility(View.GONE);
                 lvAudioFiles.setVisibility(View.VISIBLE);
                 btnDone.setVisibility(View.VISIBLE);
             }

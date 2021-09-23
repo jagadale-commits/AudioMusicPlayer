@@ -128,10 +128,6 @@ public class PlaylistAdapter extends BaseAdapter {
                     musicService.setSongsList(songsList, 0);
                     musicService.playSong();
 
-                    if (null == onPlayClicklistener) {
-                        onPlayClicklistener.onPlayClick(position);
-                    }
-
                     return true;
                 } else if (i == R.id.view) {
                     Log.i(TAG, "onMenuItemClick: view: " + position);
@@ -157,16 +153,6 @@ public class PlaylistAdapter extends BaseAdapter {
         });
 
         popup.show();
-    }
-
-    OnPlayClicklistener onPlayClicklistener;
-
-    public void setOnPlayClickListener(OnPlayClicklistener onPlayClickListener) {
-        this.onPlayClicklistener = onPlayClickListener;
-    }
-
-    public interface OnPlayClicklistener {
-        void onPlayClick(int position);
     }
 
 }
