@@ -2,6 +2,8 @@ package com.onnet.audiomusicplayer;
 
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
 import android.content.ContentResolver;
 import android.database.Cursor;
@@ -38,7 +40,7 @@ public class AddSongActivity extends AppCompatActivity {
     EditText etPlaylistName;
     String playListName;
     HashSet<Long> orginalIDs;
-
+    public final seekbarFragment seekbarfragment = new seekbarFragment();
     @RequiresApi(api = Build.VERSION_CODES.Q)
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -48,7 +50,12 @@ public class AddSongActivity extends AppCompatActivity {
         lvAudioFiles = findViewById(R.id.audiolistview);
         btnDone = findViewById(R.id.submit);
         etPlaylistName = findViewById(R.id.playlistname);
-
+        if (savedInstanceState == null) {
+            FragmentManager fm = getSupportFragmentManager();
+            FragmentTransaction fragmentTransaction = fm.beginTransaction();
+            fragmentTransaction.replace(R.id.fragment_container_view, seekbarfragment);
+            fragmentTransaction.commit();
+        }
         ArrayList<Song> originalSongs = PreferenceHandler.getPlayList( playListName);
         orginalIDs = new HashSet<>();
         for(Song s : originalSongs)

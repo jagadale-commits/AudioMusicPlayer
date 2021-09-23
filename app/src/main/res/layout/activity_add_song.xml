@@ -18,9 +18,13 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="12dp"
+
         android:text="@string/done" />
 
-    <include layout="@layout/player_layout" />
-
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/fragment_container_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:name="com.onnet.audiomusicplayer.seekbarFragment" />
 
 </LinearLayout>

@@ -53,12 +53,16 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/done"
-            android:layout_above="@id/controller"
             android:layout_centerHorizontal="true"
+            android:layout_above="@id/fragment_container_view"
             android:visibility="gone"/>
 
-
-    <include layout="@layout/player_layout" />
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/fragment_container_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:name="com.onnet.audiomusicplayer.seekbarFragment" />
 
 
 </RelativeLayout>
