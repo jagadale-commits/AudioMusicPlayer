@@ -43,7 +43,8 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
     public static int songPosn;
     private final IBinder musicBind = new MusicBinder();
     MainActivity mainActivity;
-    
+    private boolean playerPaused = false;
+
 
     @Override
     public void onCreate() {
@@ -144,7 +145,6 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
                    Log.e("MUSIC SERVICE", "Error setting data source", e);
                }
            } else {
-               songs.remove(songPosn);
                playNext();
            }
        }
@@ -194,10 +194,15 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         return player.isPlaying();
     }
 
+    public boolean isPaused() {
+        return playerPaused;
+    }
+
     public void pausePlayer() {
 
         createNotification(this, songs.get(songPosn), android.R.drawable.ic_media_play);
         player.pause();
+        playerPaused = true;
     }
 
     public void seek(int posn) {
@@ -207,6 +212,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
 
     public void go() {
         player.start();
+        playerPaused = false;
         if(songs !=null)
         createNotification(this, songs.get(songPosn), android.R.drawable.ic_media_pause);
     }

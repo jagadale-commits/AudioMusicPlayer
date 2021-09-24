@@ -118,15 +118,17 @@ public class seekbarFragment extends Fragment implements MediaController.MediaPl
 //                Log.i(TAG, "run: " + currentPos + " MS: " + ms);
             } else {
                 ivPlayPause.setImageResource(android.R.drawable.ic_media_play);
-                long currentPos = musicSrv.getPosn();
-                long duration = musicSrv.getDur();
-                String durMS = convertMillisToMS(duration);
-                String ms = convertMillisToMS(currentPos);
-                tvStartTime.setText(ms);
-                tvEndTime.setText(durMS);
-                seekBar.setMax((int) duration);
-                seekBar.setProgress((int) currentPos);
-                tvSongTitle.setText(musicSrv.getSongName());
+                if(musicSrv.isPaused()) {
+                    long currentPos = musicSrv.getPosn();
+                    long duration = musicSrv.getDur();
+                    String durMS = convertMillisToMS(duration);
+                    String ms = convertMillisToMS(currentPos);
+                    tvStartTime.setText(ms);
+                    tvEndTime.setText(durMS);
+                    seekBar.setMax((int) duration);
+                    seekBar.setProgress((int) currentPos);
+                    tvSongTitle.setText(musicSrv.getSongName());
+                }
             }
 
             seekBarHandler.postDelayed(this, 1000);
